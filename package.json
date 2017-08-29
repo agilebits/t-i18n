@@ -1,0 +1,33 @@
+{
+  "name": "t-i18n",
+  "version": "0.0.1",
+  "description": "Simple, standards-based localization",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "cd src; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
+    "test": "mocha -r ts-node/register test/*.test.ts"
+  },
+  "bin": {
+    "extract-strings": "./scripts/extract-strings.js"
+  },
+  "keywords": [
+    "i18n"
+  ],
+  "author": "Mitch Cohen",
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.0.24",
+    "chai": "^4.1.1",
+    "glob": "^7.1.2",
+    "react": "^15.6.1",
+    "react-dom-factories": "^1.0.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2",
+    "xmldom": "^0.1.27"
+  },
+  "dependencies": {
+    "@types/react": "^16.0.5"
+  }
+}
