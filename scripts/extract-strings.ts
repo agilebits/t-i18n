@@ -3,14 +3,14 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as glob from "glob";
-import {T, Plural, generator} from "../src/index"
+import * as minimist from "minimist";
+import {T, Plural, generator} from "../dist/index"
 
 const helpers = {
     "Plural": Plural,
     "generator": generator
 }
 
-let currentPrefix = "";
 
 function evaluate(node: any, src: any): any {
     if (!node) return null;
@@ -71,14 +71,6 @@ function findFunctionCall(tagName: string, src: ts.Node) {
     return res;
 }
 
-function extractPrefix(contents: string) {
-    const srcFile = ts.createSourceFile("file.ts", contents, ts.ScriptTarget.ES2017, false, ts.ScriptKind.TSX);    
-    const setupCalls = findMethodCall("i18n", "withPrefix", srcFile);
-    setupCalls.forEach(c => {
-        currentPrefix = c.arguments[0].text; 
-    });
-}
-
 function extractMessages(contents: string) {
     const srcFile = ts.createSourceFile("file.ts", contents, ts.ScriptTarget.ES2017, false, ts.ScriptKind.TSX);    
     const tCalls = [...findFunctionCall("T", srcFile), ...findMethodCall("T", "$", srcFile)];
@@ -87,7 +79,6 @@ function extractMessages(contents: string) {
         const [message, values, id] = c.arguments;
         const evaluatedMessage = evaluate(message, srcFile);
         let idText = id ? id.text : T._i18nInstance.generateId(evaluatedMessage);
-        if (currentPrefix) idText = currentPrefix + "." + idText;
         messages[idText] = evaluatedMessage;
     })
     return messages;
@@ -95,25 +86,40 @@ function extractMessages(contents: string) {
 
 function runner(err: any, files:string[]) {
     console.log(`Extracting strings from '${files[0]}' + ${files.length -1} other files...`);
-    let allMessages = {}
-    files.forEach(file => {
-        currentPrefix = "";
-        const contents = fs.readFileSync(file).toString();
-        extractPrefix(contents);
-        
-        const messages = extractMessages(contents);
-        allMessages = {...allMessages, ...messages};
-    });
+    const messages = files.map(file =>
+        new Promise(resolve =>
+            fs.readFile(file, 'utf8', (err, contents) => resolve(extractMessages(contents)))
+        )
+    );
 
+    Promise.all(messages).then(values => {
+        const allMessages = values.reduce((all:any, current:any) => {
+            return {...all, ...current};
+        }, messages[0]);
 
-    const sortedMessages = {};
-    Object.keys(allMessages).sort().forEach(function(key) {
-      sortedMessages[key] = allMessages[key];
+        output(sort(allMessages), outPath);
     });
-    fs.writeFileSync(outPath, JSON.stringify(sortedMessages, null, "\t"), {encoding:"utf8"});
-    console.log(`Extracted ${Object.keys(sortedMessages).length} strings to '${outPath}'.`);
 }
 
-const input = process.argv[2] || process.cwd() + "/**/*.ts";
-const outPath = process.argv[3] || process.cwd() + "/messages.en.json";
-glob(input, runner);
+function sort(obj: any, sortFn: any = null) {
+    let sorted = {};
+    Object.keys(obj).sort(sortFn).forEach(function(key) {
+        sorted[key] = obj[key];
+    });
+    return sorted;
+}
+
+function output(messages: any, outPath: string) {
+    if (outPath) {
+        fs.writeFileSync(outPath, JSON.stringify(messages, null, "\t"), {encoding:"utf8"});
+        console.log(`Extracted ${Object.keys(messages).length} strings to '${outPath}'.`);
+    } else {
+        console.log(JSON.stringify(messages))
+    }
+}
+
+
+const args = minimist(process.argv.slice(2));
+const input = args._[0] || process.cwd() + "/**/*.ts";
+const outPath = args.outfile || null;
+glob(input, {absolute: true}, runner);
