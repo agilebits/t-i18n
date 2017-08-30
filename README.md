@@ -72,6 +72,7 @@ T("You have " + Plural("numCats", {
     one: "1 cat",
     other: "# cats",
 }), {numCats: 4})
+```
 
 ### Speak React
 
