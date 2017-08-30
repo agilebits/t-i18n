@@ -184,6 +184,37 @@ describe("T.date", () => {
 });
 
 
+describe("T.number", () => {
+    const T = createI18n();
+    T.setup({
+        locale: "he"
+    });
+
+    it("should print a localized number using the default (decimal) format", () => {
+        const number = 15;
+        const expected = new Intl.NumberFormat("he", numberFormatOptions.default).format(number);
+        [null, 'default', 'nonexistent'].forEach(format => {
+            const result = T.number(number, format);
+            expect(result).to.equal(expected);            
+        });
+    });
+
+    it("should print a localized currency value in USD", () => {
+        const number = 10.5;
+        const expected = new Intl.NumberFormat("he", numberFormatOptions.currency).format(number);
+        const result = T.number(number, "currency");
+        expect(result).to.equal(expected);
+    });
+
+    it("should print a number in the provided locale", () => {
+        const number = 25;
+        const expected = new Intl.NumberFormat("ko", numberFormatOptions.default).format(number);
+        const result = T.number(number, null, "ko");
+        expect(result).to.equal(expected);
+    });
+});
+
+
 function createI18n() {
     return makeI18n();
 }

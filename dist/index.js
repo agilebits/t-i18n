@@ -31,7 +31,8 @@ exports.dateTimeFormatOptions = {
 exports.dateTimeFormatOptions.default = exports.dateTimeFormatOptions.long;
 exports.numberFormatOptions = {
     currency: {
-        style: 'currency'
+        style: 'currency',
+        currency: "USD"
     },
     decimal: {
         style: 'decimal'

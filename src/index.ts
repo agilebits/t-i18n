@@ -93,7 +93,8 @@ dateTimeFormatOptions.default = dateTimeFormatOptions.long;
 
 export let numberFormatOptions: {[s: string]: Intl.NumberFormatOptions} = {
 	currency: {
-		style: 'currency'
+		style: 'currency',
+		currency: "USD"
 	},
 	decimal: {
 		style: 'decimal'
