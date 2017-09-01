@@ -1,7 +1,7 @@
 /// <reference path="../../node_modules/@types/react/index.d.ts" />
 /**
  * T.js - lightweight localization
- * v0.1
+ * v0.2
  *
  * T.js defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
@@ -32,7 +32,7 @@ export interface PluralOptions {
 }
 export interface TFunc {
     (message: string, replacements?: Replacements, id?: string): string;
-    lookup?: (id: string, replacements?: Replacements, defaultMFunc?: MFunc) => string;
+    lookup?: (id: string, replacements?: Replacements, defaultMessage?: string) => string;
     setup?: (options?: SetupOptions) => any;
     date?: (value: any, formatName?: string, locale?: string) => string;
     number?: (value: any, formatName?: string, locale?: string) => string;
@@ -67,9 +67,9 @@ export declare class I18n {
     static defaultSetup: SetupOptions;
     constructor(options?: SetupOptions);
     format(type: string, value: number | Date, formatStyle?: string, locale?: string): any;
-    mFuncForKey(key: string, locale?: string): MFunc;
+    getKey(key: string, locale?: string): MFunc | String;
     generateId(message: string): any;
-    lookup(id: string, replacements?: Replacements, defaultMFunc?: MFunc): string;
+    lookup(id: string, replacements?: Replacements, defaultMessage?: string): string;
     setup(options?: SetupOptions): SetupOptions;
 }
 export declare function i18nNamespace(): TFunc;

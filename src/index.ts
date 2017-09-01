@@ -2,7 +2,7 @@
 
 /**
  * T.js - lightweight localization
- * v0.1
+ * v0.2
  *
  * T.js defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
@@ -55,7 +55,7 @@ export interface PluralOptions {
 //
 export interface TFunc {
 	(message: string, replacements?: Replacements, id?: string): string;
-	lookup?: (id: string, replacements?: Replacements, defaultMFunc?:MFunc) => string 
+	lookup?: (id: string, replacements?: Replacements, defaultMessage?:string) => string 
 	setup?: (options?: SetupOptions) => any;
 	date?: (value: any, formatName?: string, locale?: string) => string;
 	number?: (value: any, formatName?: string, locale?: string) => string;
@@ -159,8 +159,7 @@ export class I18n {
 	static defaultSetup: SetupOptions = {
 		messages: {},
 		locale: defaultLanguage,
-		idGenerator: generator.hyphens,
-		compiler: (message: string) => () => message
+		idGenerator: generator.hyphens
 	}
 	
 	constructor(options: SetupOptions = null) {
@@ -177,23 +176,32 @@ export class I18n {
 		return formatter.call(this, locale, (options[formatStyle] || options.default)).format(value);
 	}
 
-	mFuncForKey(key: string, locale: string = this.locale):MFunc {
-		const d = this.messages[locale];
-		if (!d || !d[key]) return;
-		if (typeof d[key] === "string") return this.compiler(<string>d[key]);
-		return <MFunc>d[key];
+	getKey(key: string, locale: string = this.locale):MFunc|String {
+		const messages = this.messages[locale];
+		const defaultMessages = this.messages[defaultLanguage];
+
+		if (messages && messages[key]) {
+			return messages[key];
+		}
+		if (defaultMessages && defaultMessages[key]) {
+			return defaultMessages[key];
+		}
+
+		return;
 	}
 
 	generateId(message: string) {
 		return this.idGenerator(message);
 	}
 	
-	lookup(id: string, replacements: Replacements = null, defaultMFunc?:MFunc):string {
-		if (!defaultMFunc) defaultMFunc = () => id;
+	lookup(id: string, replacements: Replacements = null, defaultMessage:string = null):string {
+		const translation = this.getKey(id, this.locale) || defaultMessage || id;
+		if (typeof translation === "string") {
+			if (this.compiler) return this.compiler(translation)(replacements);						
+			return compileICU(translation, replacements);
+		}
 
-		let mFunc = this.mFuncForKey(id, this.locale) || this.mFuncForKey(id, defaultLanguage);
-		if (!mFunc) mFunc = defaultMFunc;
-		return mFunc(replacements);
+		return (<MFunc>translation)(replacements);
 	}
 	
 	setup(options: SetupOptions = {}): SetupOptions {
@@ -245,13 +253,37 @@ function parseXML(xmlString: string, replacements: any[]) {
 	return elements;
 }
 
+const TOKEN = {
+	START: '{',
+	END: '}',
+}
+function compileICU(icuString: string, replacements: Replacements):string {
+	if (!replacements) return icuString;
+	
+	let currentElement = '';
+	let parsedElements = [];
+	for (let i = 0; i < icuString.length; i++) {
+		switch (icuString.charAt(i)) {
+		case TOKEN.START:
+			parsedElements.push(currentElement);
+			currentElement = '';
+			break;
+		case TOKEN.END:
+			parsedElements.push(replacements[currentElement]);
+			currentElement = '';
+			break;
+		default:
+			currentElement += icuString.charAt(i);
+		}
+	}
+	parsedElements.push(currentElement);	
+	return parsedElements.join('');
+}
+
 function createT(context: I18n): TFunc {
 	let T: TFunc = function translate(message: string, replacements?: (Replacements), id?: string): string {
 		if (!id) id = context.generateId(message);
-
-		let defaultMFunc = context.mFuncForKey(id, defaultLanguage);
-		if (!defaultMFunc) defaultMFunc = () => message;
-		return context.lookup(id, replacements, defaultMFunc)
+		return context.lookup(id, replacements, message);
 	}
 	T._i18nInstance = context;
 	T.setup = context.setup.bind(T._i18nInstance);

@@ -92,26 +92,31 @@ var I18n = (function () {
         var formatter = (type === "date") ? this.dateFormatter : this.numberFormatter;
         return formatter.call(this, locale, (options[formatStyle] || options.default)).format(value);
     };
-    I18n.prototype.mFuncForKey = function (key, locale) {
+    I18n.prototype.getKey = function (key, locale) {
         if (locale === void 0) { locale = this.locale; }
-        var d = this.messages[locale];
-        if (!d || !d[key])
-            return;
-        if (typeof d[key] === "string")
-            return this.compiler(d[key]);
-        return d[key];
+        var messages = this.messages[locale];
+        var defaultMessages = this.messages[exports.defaultLanguage];
+        if (messages && messages[key]) {
+            return messages[key];
+        }
+        if (defaultMessages && defaultMessages[key]) {
+            return defaultMessages[key];
+        }
+        return;
     };
     I18n.prototype.generateId = function (message) {
         return this.idGenerator(message);
     };
-    I18n.prototype.lookup = function (id, replacements, defaultMFunc) {
+    I18n.prototype.lookup = function (id, replacements, defaultMessage) {
         if (replacements === void 0) { replacements = null; }
-        if (!defaultMFunc)
-            defaultMFunc = function () { return id; };
-        var mFunc = this.mFuncForKey(id, this.locale) || this.mFuncForKey(id, exports.defaultLanguage);
-        if (!mFunc)
-            mFunc = defaultMFunc;
-        return mFunc(replacements);
+        if (defaultMessage === void 0) { defaultMessage = null; }
+        var translation = this.getKey(id, this.locale) || defaultMessage || id;
+        if (typeof translation === "string") {
+            if (this.compiler)
+                return this.compiler(translation)(replacements);
+            return compileICU(translation, replacements);
+        }
+        return translation(replacements);
     };
     I18n.prototype.setup = function (options) {
         if (options === void 0) { options = {}; }
@@ -134,8 +139,7 @@ var I18n = (function () {
     I18n.defaultSetup = {
         messages: {},
         locale: exports.defaultLanguage,
-        idGenerator: exports.generator.hyphens,
-        compiler: function (message) { return function () { return message; }; }
+        idGenerator: exports.generator.hyphens
     };
     return I18n;
 }());
@@ -172,14 +176,37 @@ function parseXML(xmlString, replacements) {
     }
     return elements;
 }
+var TOKEN = {
+    START: '{',
+    END: '}',
+};
+function compileICU(icuString, replacements) {
+    if (!replacements)
+        return icuString;
+    var currentElement = '';
+    var parsedElements = [];
+    for (var i = 0; i < icuString.length; i++) {
+        switch (icuString.charAt(i)) {
+            case TOKEN.START:
+                parsedElements.push(currentElement);
+                currentElement = '';
+                break;
+            case TOKEN.END:
+                parsedElements.push(replacements[currentElement]);
+                currentElement = '';
+                break;
+            default:
+                currentElement += icuString.charAt(i);
+        }
+    }
+    parsedElements.push(currentElement);
+    return parsedElements.join('');
+}
 function createT(context) {
     var T = function translate(message, replacements, id) {
         if (!id)
             id = context.generateId(message);
-        var defaultMFunc = context.mFuncForKey(id, exports.defaultLanguage);
-        if (!defaultMFunc)
-            defaultMFunc = function () { return message; };
-        return context.lookup(id, replacements, defaultMFunc);
+        return context.lookup(id, replacements, message);
     };
     T._i18nInstance = context;
     T.setup = context.setup.bind(T._i18nInstance);

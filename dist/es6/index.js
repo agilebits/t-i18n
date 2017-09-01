@@ -77,24 +77,28 @@ export class I18n {
         const formatter = (type === "date") ? this.dateFormatter : this.numberFormatter;
         return formatter.call(this, locale, (options[formatStyle] || options.default)).format(value);
     }
-    mFuncForKey(key, locale = this.locale) {
-        const d = this.messages[locale];
-        if (!d || !d[key])
-            return;
-        if (typeof d[key] === "string")
-            return this.compiler(d[key]);
-        return d[key];
+    getKey(key, locale = this.locale) {
+        const messages = this.messages[locale];
+        const defaultMessages = this.messages[defaultLanguage];
+        if (messages && messages[key]) {
+            return messages[key];
+        }
+        if (defaultMessages && defaultMessages[key]) {
+            return defaultMessages[key];
+        }
+        return;
     }
     generateId(message) {
         return this.idGenerator(message);
     }
-    lookup(id, replacements = null, defaultMFunc) {
-        if (!defaultMFunc)
-            defaultMFunc = () => id;
-        let mFunc = this.mFuncForKey(id, this.locale) || this.mFuncForKey(id, defaultLanguage);
-        if (!mFunc)
-            mFunc = defaultMFunc;
-        return mFunc(replacements);
+    lookup(id, replacements = null, defaultMessage = null) {
+        const translation = this.getKey(id, this.locale) || defaultMessage || id;
+        if (typeof translation === "string") {
+            if (this.compiler)
+                return this.compiler(translation)(replacements);
+            return compileICU(translation, replacements);
+        }
+        return translation(replacements);
     }
     setup(options = {}) {
         const { locale, idGenerator, messages, compiler } = options;
@@ -117,8 +121,7 @@ export class I18n {
 I18n.defaultSetup = {
     messages: {},
     locale: defaultLanguage,
-    idGenerator: generator.hyphens,
-    compiler: (message) => () => message
+    idGenerator: generator.hyphens
 };
 let parser;
 function parseXML(xmlString, replacements) {
@@ -152,14 +155,37 @@ function parseXML(xmlString, replacements) {
     }
     return elements;
 }
+const TOKEN = {
+    START: '{',
+    END: '}',
+};
+function compileICU(icuString, replacements) {
+    if (!replacements)
+        return icuString;
+    let currentElement = '';
+    let parsedElements = [];
+    for (let i = 0; i < icuString.length; i++) {
+        switch (icuString.charAt(i)) {
+            case TOKEN.START:
+                parsedElements.push(currentElement);
+                currentElement = '';
+                break;
+            case TOKEN.END:
+                parsedElements.push(replacements[currentElement]);
+                currentElement = '';
+                break;
+            default:
+                currentElement += icuString.charAt(i);
+        }
+    }
+    parsedElements.push(currentElement);
+    return parsedElements.join('');
+}
 function createT(context) {
     let T = function translate(message, replacements, id) {
         if (!id)
             id = context.generateId(message);
-        let defaultMFunc = context.mFuncForKey(id, defaultLanguage);
-        if (!defaultMFunc)
-            defaultMFunc = () => message;
-        return context.lookup(id, replacements, defaultMFunc);
+        return context.lookup(id, replacements, message);
     };
     T._i18nInstance = context;
     T.setup = context.setup.bind(T._i18nInstance);

@@ -78,12 +78,14 @@ describe("T", () => {
             "hello--world": () => "Hello, world",
             "goodbye--world": () => "Goodbye, world",
             "some-id": () => "Some message",
-            "greet": (d: any) => "Hi, " + d.name
+            "greet": () => "Hi, {name}",
+            "greet-precompiled": (d: any) => "Hi, " + d.name
         },
         es: {
             "hello--world": () => "Hola, mundo",
             "some-id": () => "Algún mensaje",
-            "greet": (d: any) => "Hola, " + d.name,
+            "greet": () => "Hola, {name}",
+            "greet-precompiled": (d: any) => "Hola, " + d.name,
             "not-compiled": "No compilado",
         }
     }
@@ -105,7 +107,7 @@ describe("T", () => {
         expect(result).to.equal(expected);
     });
 
-    it("should use the provided default translation", () => {
+    it("should use the provided message if no translation is found", () => {
         const expected = "So long, world";
         const result = T("So long, world");
         expect(result).to.equal(expected);
@@ -117,15 +119,15 @@ describe("T", () => {
         expect(result).to.equal(expected);
     });
 
-    it("should pass replacements to the message function", () => {
+    it("should pass replacements to a precompiled message function", () => {
         const expected = "Hola, Mitch";
-        const result = T("Hi, {name}", {name: "Mitch"}, "greet");
+        const result = T("Hi, {name}", {name: "Mitch"}, "greet-precompiled");
         expect(result).to.equal(expected);
     });
 
-    it("should use the default compiler to render a string message", () => {
-        const expected = "No compilado";
-        const result = T("Not compiled");
+    it("should compile a string message with replacements", () => {
+        const expected = "Howdy, Mitch";
+        const result = T("Howdy, {name}", {name: "Mitch"});
     });
 });
 
