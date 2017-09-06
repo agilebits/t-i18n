@@ -13,7 +13,7 @@
   "scripts": {
     "clean": "cd dist/; rm -rf *",
     "build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
-    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "mocha -r ts-node/register ./test/*.test.ts"
   },
   "bin": {
