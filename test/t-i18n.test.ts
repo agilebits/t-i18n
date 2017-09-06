@@ -1,7 +1,9 @@
 /// <reference path="../node_modules/@types/mocha/index.d.ts" />
 
 import { expect } from "chai";
-import {T, makeI18n, createCachedFormatter, Plural, generator, dateTimeFormatOptions, numberFormatOptions} from "../src/index";
+import {T, makeT} from "../src/index";
+import {Plural, generator} from "../src/helpers";
+import {dateTimeFormatOptions, numberFormatOptions} from "../src/format";
 
 import * as DOM from "react-dom-factories";
 import * as React from "react";
@@ -27,47 +29,6 @@ describe("Plural", () => {
         });
 
         expect(result).to.equal(expected);
-    });
-});
-
-describe("createCachedFormatter", () => {
-    it("should create a date formatter", () => {
-        const options =  {day: "numeric", month: "long", year: "numeric"};
-        const date = new Date(2017, 8, 1);
-        const formatter = createCachedFormatter(Intl.DateTimeFormat);
-        
-        const expected = new Intl.DateTimeFormat("en", options).format(date);
-        const result = (<Intl.DateTimeFormat>formatter("en", options)).format(date);
-        
-        expect (result).to.equal(expected);
-    });
-
-    it("should cache a new date formatter with the same settings", () => {
-        const formatter = createCachedFormatter(Intl.DateTimeFormat); 
-        const a = formatter("en", {month: "long", year: "2-digit"});
-        const b = formatter("en", {month: "long", year: "2-digit"});
-        
-        const result = (a === b);
-        
-        expect (result).to.equal(true);
-    });
-
-    it("should create a number formatter", () => {
-        const formatter = createCachedFormatter(Intl.NumberFormat);
-    
-        const expected = new Intl.NumberFormat("es").format(2.3);
-        const result = (<Intl.NumberFormat>formatter("es")).format(2.3);
-        expect (result).to.equal(expected);
-    });
-
-    it("should cache a new number formatter with the same settings", () => {
-        const formatter = createCachedFormatter(Intl.NumberFormat);        
-        const a = formatter("ja");
-        const b = formatter("ja");
-        
-        const result = (a === b);
-        
-        expect (result).to.equal(true);
     });
 });
 
@@ -135,23 +96,23 @@ describe("T.$", () => {
     const T = createI18n();
     const factory = DOM.a;
     const props = {href: "https://google.com"};
-    const element = factory(props, "Hello world");
+    const element = factory(props, "world");
     
     it("should replace a react component factory and pass inner string as children", () => {
-        const expected = element;
-        const result = T.$("<link>Hello world</link>", {
+        const expected = ["Hello, ", element, "!"];
+        const result = T.$("Hello, <link>world</link>!", {
             link: [factory, props]
         });
         expect(result).to.be.an('array');
-        expect(result[0]).to.deep.equal(expected);
+        expect(result).to.deep.equal(expected);
     });
     it("should replace a react component", () => {
-        const expected = element;
+        const expected = [element];
         const result = T.$("<link />", {
             link: element
         })
         expect(result).to.be.an('array');
-        expect(result[0]).to.deep.equal(expected);
+        expect(result).to.deep.equal(expected);
     });
 });
 
@@ -218,5 +179,5 @@ describe("T.number", () => {
 
 
 function createI18n() {
-    return makeI18n();
+    return makeT();
 }

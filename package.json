@@ -1,20 +1,27 @@
 {
   "name": "t-i18n",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0",
   "description": "Simple, standards-based localization",
+  "author": "Mitch Cohen <mitch.cohen@me.com>",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "cd src; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
-    "test": "mocha -r ts-node/register test/*.test.ts"
+    "clean": "cd dist/; rm -rf *",
+    "build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
+    "prepublish": "npm run build",
+    "test": "mocha -r ts-node/register ./test/*.test.ts"
   },
   "bin": {
     "extract-strings": "./scripts/extract-strings.js"
   },
   "keywords": [
-    "i18n"
+    "i18n",
+    "l10n",
+    "globalization",
+    "translation",
+    "icu"
   ],
-  "author": "Mitch Cohen",
   "devDependencies": {
     "@types/chai": "^4.0.4",
     "@types/mocha": "^2.2.42",
@@ -24,7 +31,7 @@
     "react": "^15.6.1",
     "react-dom-factories": "^1.0.1",
     "ts-node": "^3.3.0",
-    "typescript": "^2.4.2",
+    "typescript": "^2.5.2",
     "xmldom": "^0.1.27"
   },
   "dependencies": {

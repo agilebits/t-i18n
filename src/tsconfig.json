@@ -4,6 +4,8 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es5",
+        "removeComments": true,
+        "declaration": true,
         "outDir": "../dist/"
     }
 }
