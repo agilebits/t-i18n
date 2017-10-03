@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@types/react/index.d.ts" />
-
 // Messages functions have replacement/pluralization logic baked in
 // Use a tool like MessageFormat to generate these from strings
 //
