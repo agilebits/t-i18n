@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@types/react/index.d.ts" />
-
 import { ReactReplacements, ReactFactory } from "./types";
 
 function walk(node: Node, replacements: ReactReplacements): React.ReactNode {

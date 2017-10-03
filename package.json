@@ -1,6 +1,6 @@
 {
   "name": "t-i18n",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Simple, standards-based localization",
   "author": "Mitch Cohen <mitch.cohen@me.com>",
   "repository": {
@@ -39,7 +39,7 @@
     "xmldom": "^0.1.27"
   },
   "dependencies": {
-    "@types/react": "^16.0.5",
+    "@types/react": "^16.0.8",
     "minimist": "^1.2.0"
   }
 }
