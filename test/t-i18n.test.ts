@@ -36,14 +36,14 @@ describe("T", () => {
     const T = createI18n();
     const messages = {
         en: {
-            "hello--world": () => "Hello, world",
-            "goodbye--world": () => "Goodbye, world",
+            "Hello--world": () => "Hello, world",
+            "Goodbye--world": () => "Goodbye, world",
             "some-id": () => "Some message",
             "greet": () => "Hi, {name}",
             "greet-precompiled": (d: any) => "Hi, " + d.name
         },
         es: {
-            "hello--world": () => "Hola, mundo",
+            "Hello--world": () => "Hola, mundo",
             "some-id": () => "Algún mensaje",
             "greet": () => "Hola, {name}",
             "greet-precompiled": (d: any) => "Hola, " + d.name,

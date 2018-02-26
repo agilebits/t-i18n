@@ -12,7 +12,7 @@ export const generator = {
 		return message;
 	},
 	hyphens(message: string):string {
-		const hyphenated = message.toLowerCase().trim().replace(spaceRegex, "-").replace(nonWordRegex, '-');
+		const hyphenated = message.trim().replace(spaceRegex, "-").replace(nonWordRegex, '-');
 		return hyphenated;
 	}
 }

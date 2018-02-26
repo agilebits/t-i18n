@@ -22,7 +22,7 @@ Translate the JSON files:
 ```js
 // messages.es.json
 {
-    "hello-world": "Hola mundo"
+    "Hello-world": "Hola mundo"
 }
 ```
 
