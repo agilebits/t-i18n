@@ -4,7 +4,7 @@
 // const mFunc = (name) => "Hello, " + name
 // mFunc("Mitch") // "Hello, Mitch"
 //
-export type MFunc =  (replacements?: Replacements) => string;
+export type MFunc =  (replacements?: Replacements | null) => string;
 // Function to compile strings into message functions during runtime
 export type Compiler = (message: string) => MFunc;
 

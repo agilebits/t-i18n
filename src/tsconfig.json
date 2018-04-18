@@ -6,6 +6,7 @@
         "target": "es5",
         "removeComments": true,
         "declaration": true,
+        "strict": true,
         "outDir": "../dist/"
     }
 }

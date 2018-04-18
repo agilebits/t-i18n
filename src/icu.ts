@@ -11,7 +11,7 @@ const TOKEN = {
 // replacement: OPEN value CLOSE
 // value: STRING 
 
-export default function parseICU(icuString: string, replacements: Replacements|ReactReplacements):string {
+export default function parseICU(icuString: string, replacements: Replacements|ReactReplacements|null):string {
 	if (!replacements) return icuString;
 	
 	let currentToken = '';

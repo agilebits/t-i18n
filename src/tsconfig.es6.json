@@ -6,6 +6,7 @@
         "target": "es6",
         "removeComments": true,
         "declaration": true,
-        "outDir": "../dist/es6/"
+        "outDir": "../dist/es6/",
+        "strict": true
     }
 }

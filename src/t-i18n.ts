@@ -19,20 +19,20 @@ import parseReact from "./react";
 //
 export interface TFunc {
 	(message: string, replacements?: Replacements, id?: string): string;
-	lookup?: (id: string, replacements?: Replacements, defaultMessage?:string) => string 
-	setup?: (options?: SetupOptions) => any;
-	date?: (value: any, formatName?: string, locale?: string) => string;
-	number?: (value: any, formatName?: string, locale?: string) => string;
-	$?: (message: string, replacements?: ReactReplacements, id?: string) => React.ReactNode[];
+	lookup: (id: string, replacements?: Replacements, defaultMessage?:string) => string 
+	setup: (options?: SetupOptions) => any;
+	date: (value: any, formatName?: string, locale?: string) => string;
+	number: (value: any, formatName?: string, locale?: string) => string;
+	$: (message: string, replacements?: ReactReplacements, id?: string) => React.ReactNode[];
 	_i18nInstance?: I18n;
 }
 
 export const defaultLanguage = "en";
 
 export class I18n {
-	locale: string;	
-	messages: Messages;
-	idGenerator: (message: string) => any;
+	locale!: string;	
+	messages!: Messages;
+	idGenerator!: (message: string) => any;
 	dateFormatter: CachedFormatter;
 	numberFormatter: CachedFormatter;
 	
@@ -42,7 +42,7 @@ export class I18n {
 		idGenerator: generator.hyphens
 	}
 	
-	constructor(options: SetupOptions = null) {
+	constructor(options?: SetupOptions) {
 		this.setup({...I18n.defaultSetup, ...options});
 
 		this.dateFormatter = createCachedFormatter(Intl.DateTimeFormat);
@@ -51,9 +51,10 @@ export class I18n {
 
 	format(type: string, value: number|Date, formatStyle?: string, locale: string = this.locale) {
 		const options = (type === "date") ? dateTimeFormatOptions : numberFormatOptions;
-		const formatter = (type === "date") ? this.dateFormatter : this.numberFormatter;
-		
-		return formatter.call(this, locale, (options[formatStyle] || options.default)).format(value);
+		const formatter = (type === "date") ? this.dateFormatter : this.numberFormatter;	
+		const optionsForFormatStyle = formatStyle ? (options[formatStyle] || options.default) : options.default;
+
+		return formatter.call(this, locale, optionsForFormatStyle).format(value);
 	}
 
 	getKey(key: string, locale: string = this.locale):MFunc|String {
@@ -67,14 +68,14 @@ export class I18n {
 			return defaultMessages[key];
 		}
 
-		return;
+		return "";
 	}
 
-	generateId(message: string) {
+	generateId(message: string): string {
 		return this.idGenerator(message);
 	}
 	
-	lookup(id: string, replacements: Replacements = null, defaultMessage:string = null):string {
+	lookup(id: string, replacements: Replacements | null = null, defaultMessage:string | null = null):string {
 		const translation = this.getKey(id, this.locale) || defaultMessage || id;
 		if (typeof translation === "string") {
 			return parseICU(translation, replacements);
@@ -98,7 +99,7 @@ export class I18n {
 }
 
 function createT(context: I18n): TFunc {
-	let T: TFunc = function translate(message: string, replacements?: (Replacements), id?: string): string {
+	let T: any = function translate(message: string, replacements?: (Replacements), id?: string): string {
 		if (!id) id = context.generateId(message);
 		return context.lookup(id, replacements, message);
 	}
@@ -108,7 +109,7 @@ function createT(context: I18n): TFunc {
 	T.date = context.format.bind(T._i18nInstance, "date");
 	T.number = context.format.bind(T._i18nInstance, "number");
 
-	T.$ = function translateReact(message: string, replacements?: ReactReplacements, id?: string): React.ReactNode[] {
+	T.$ = function translateReact(message: string, replacements: ReactReplacements | null = null, id?: string): React.ReactNode[] {
 		const translatedMessage = T.apply(this, arguments);
 		const reactElements = parseReact(translatedMessage, replacements);
 		return reactElements;
