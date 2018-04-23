@@ -4,7 +4,7 @@
 // const mFunc = (name) => "Hello, " + name
 // mFunc("Mitch") // "Hello, Mitch"
 //
-export type MFunc =  (replacements?: Replacements | null) => string;
+export type MFunc =  (replacements?: Replacements) => string;
 // Function to compile strings into message functions during runtime
 export type Compiler = (message: string) => MFunc;
 
@@ -30,13 +30,17 @@ export interface SetupOptions {
 }
 
 // { name: "Mitch", age: 10 }
-export interface Replacements {
+export interface ReplacementsMap {
 	[s: string]: string|number
 }
+
+export type Replacements = ReplacementsMap | null;
 
 // React
 export type ReactFactory = [React.Factory<any>, React.Props<any>];
 
-export interface ReactReplacements {
+export interface ReactReplacementsMap {
     [s: string]: ReactFactory | React.ReactNode | JSX.Element | string | number
 }
+
+export type ReactReplacements = ReactReplacementsMap | null;

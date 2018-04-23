@@ -1,7 +1,7 @@
 import { ReactReplacements, ReactFactory } from "./types";
 import { notDeepEqual } from "assert";
 
-function walk(node: Node, replacements: ReactReplacements   |null=null): React.ReactNode {
+function walk(node: Node, replacements: ReactReplacements = null): React.ReactNode {
     const children = node.childNodes;
     // node has no children
     if (!children || children.length === 0) {
@@ -17,7 +17,7 @@ function walk(node: Node, replacements: ReactReplacements   |null=null): React.R
     return replaceReactFactory(node.nodeName, reactChildren, replacements)
 }
 
-function replaceReactFactory(name:string, children:React.ReactNode[], replacements: ReactReplacements|null = null) {
+function replaceReactFactory(name:string, children:React.ReactNode[], replacements: ReactReplacements = null) {
     if (!replacements) return null;
 
     const [factory, props] = replacements[name] as ReactFactory;
@@ -25,7 +25,7 @@ function replaceReactFactory(name:string, children:React.ReactNode[], replacemen
 }
 
 let parser: DOMParser;
-export default function parseReact(xmlString: string, replacements: ReactReplacements | null): React.ReactNode[] {
+export default function parseReact(xmlString: string, replacements: ReactReplacements): React.ReactNode[] {
 	if (typeof parser === 'undefined') {
 		parser = new DOMParser();
     }

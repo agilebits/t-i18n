@@ -75,7 +75,7 @@ export class I18n {
 		return this.idGenerator(message);
 	}
 	
-	lookup(id: string, replacements: Replacements | null = null, defaultMessage:string | null = null):string {
+	lookup(id: string, replacements: Replacements = null, defaultMessage:string | null = null):string {
 		const translation = this.getKey(id, this.locale) || defaultMessage || id;
 		if (typeof translation === "string") {
 			return parseICU(translation, replacements);
@@ -109,7 +109,7 @@ function createT(context: I18n): TFunc {
 	T.date = context.format.bind(T._i18nInstance, "date");
 	T.number = context.format.bind(T._i18nInstance, "number");
 
-	T.$ = function translateReact(message: string, replacements: ReactReplacements | null = null, id?: string): React.ReactNode[] {
+	T.$ = function translateReact(message: string, replacements: ReactReplacements = null, id?: string): React.ReactNode[] {
 		const translatedMessage = T.apply(this, arguments);
 		const reactElements = parseReact(translatedMessage, replacements);
 		return reactElements;
