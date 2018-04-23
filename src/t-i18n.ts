@@ -6,7 +6,7 @@ import parseReact from "./react";
 
 /**
  * T-i18n - lightweight localization
- * v0.2
+ * v0.3.1
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
@@ -30,9 +30,9 @@ export interface TFunc {
 export const defaultLanguage = "en";
 
 export class I18n {
-	locale!: string;	
-	messages!: Messages;
-	idGenerator!: (message: string) => any;
+	locale: string = "en";	
+	messages: Messages = {};
+	idGenerator: (message: string) => string = generator.hyphens;
 	dateFormatter: CachedFormatter;
 	numberFormatter: CachedFormatter;
 	
