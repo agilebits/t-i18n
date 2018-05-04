@@ -66,10 +66,16 @@ T("First name: {userName}", { userName: "Wendy"})
 Non-string values (like React components) can be interpolated using an XML syntax.
 
 ```jsx
-// ["There's a ", <button>button</button>, " in my text!"]
-T.$("There's a <myButton /> in my text!", {
-     myButton: () => <button>button</button>
-})
+// ["There's a ", <button>button</button>, " in my sentence!"]
+T.$(
+    "There's a <myButton /> in my {text}!",
+    {
+        text: "sentence"
+    }
+    {
+        myButton: () => <button>button</button>
+    }
+)
 ```
 
 If your components have string children, you can translate them inline.
@@ -79,10 +85,14 @@ If your components have string children, you can translate them inline.
 //     <a href={"/user/" + user.uuid}>Visit your <strong>profile</strong></a>,
 //     " to change your profile picture."
 // ]
-T.$("<link>Visit your <strong>profile</strong></link> to change your profile picture.", {
-    link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
-    strong: (...children) => <strong>{...children}</strong>,
-})
+T.$(
+    "<link>Visit your <strong>profile</strong></link> to change your profile picture.",
+    {},
+    {
+        link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
+        strong: (...children) => <strong>{...children}</strong>,
+    }
+)
 ```
 
 ## Pluralization and advanced ICU syntax
