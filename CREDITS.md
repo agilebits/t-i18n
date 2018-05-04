@@ -1,4 +1,6 @@
-While this library does not depend on third-party code, I am grateful to the following projects for both inspiration and the feature integrations they make possible:
+`t-i18n` is Copyright &copy; 2017-2018 AgileBits Inc.
+
+While this library does not depend on third-party code, we're grateful to the following projects for both inspiration and the feature integrations they make possible:
 
 * Parts of the API were inspired by [format-message](https://github.com/format-message/format-message), Copyright &copy; 2015 Andy VanWagoner.
 
