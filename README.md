@@ -70,10 +70,8 @@ Non-string values (like React components) can be interpolated using an XML synta
 T.$(
     "There's a <myButton /> in my {text}!",
     {
-        text: "sentence"
-    }
-    {
-        myButton: () => <button>button</button>
+        myButton: () => <button>button</button>,
+        text: "sentence",
     }
 )
 ```
@@ -87,7 +85,6 @@ If your components have string children, you can translate them inline.
 // ]
 T.$(
     "<link>Visit your <strong>profile</strong></link> to change your profile picture.",
-    {},
     {
         link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
         strong: (...children) => <strong>{...children}</strong>,
