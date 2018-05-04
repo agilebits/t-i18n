@@ -5,11 +5,8 @@ import {T, makeT} from "../src/index";
 import {Plural, generator} from "../src/helpers";
 import {dateTimeFormatOptions, numberFormatOptions} from "../src/format";
 
-import * as DOM from "react-dom-factories";
-import * as React from "react";
-
 // Shim for DOM XML parser
-import {DOMParser } from "xmldom";
+import { DOMParser } from "xmldom";
 global['DOMParser'] = DOMParser;
 global['Node'] = {
     ELEMENT_NODE: 1
@@ -20,7 +17,7 @@ describe("Plural", () => {
                             "\t=0{0 minutes}\n" +
                             "\tone{1 minute}\n" +
                             "\tother{# minutes}}";
-                            
+
     it("should print a formatted plural string", () => {
         const result = Plural("numMinutes", {
             one: "1 minute",
@@ -94,23 +91,22 @@ describe("T", () => {
 
 describe("T.$", () => {
     const T = createI18n();
-    const factory = DOM.a;
-    const props = {href: "https://google.com"};
-    const element = factory(props, "world");
-    
-    it("should replace a react component factory and pass inner string as children", () => {
+    const factory = (...children) => ({ href: "https://google.com", children });
+    const element = factory("world");
+
+    it("should replace an XML tag with the named function and pass inner string as children", () => {
         const expected = ["Hello, ", element, "!"];
-        const result = T.$("Hello, <link>world</link>!", {
-            link: [factory, props]
-        });
+        const result = T.$(
+            "Hello, <link>world</link>!",
+            {},
+            { link: factory }
+        );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
-    it("should replace a react component", () => {
+    it("should replace a self-closing tag", () => {
         const expected = [element];
-        const result = T.$("<link />", {
-            link: element
-        })
+        const result = T.$("<link />", {}, { link: () => element })
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
@@ -127,7 +123,7 @@ describe("T.date", () => {
         const expected = new Intl.DateTimeFormat("it", dateTimeFormatOptions.default).format(date);
         [null, 'default', 'nonexistent'].forEach(format => {
             const result = T.date(date, format);
-            expect(result).to.equal(expected);            
+            expect(result).to.equal(expected);
         });
     });
 
@@ -158,7 +154,7 @@ describe("T.number", () => {
         const expected = new Intl.NumberFormat("he", numberFormatOptions.default).format(number);
         [null, 'default', 'nonexistent'].forEach(format => {
             const result = T.number(number, format);
-            expect(result).to.equal(expected);            
+            expect(result).to.equal(expected);
         });
     });
 

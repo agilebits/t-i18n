@@ -59,25 +59,29 @@ Formatters cache themselves automatically, so you don't have to.
 Basic values are easy to replace.
 
 ```js
-// "First name: Wendy
+// "First name: Wendy"
 T("First name: {userName}", { userName: "Wendy"})
 ```
 
-So are React components.
+Non-string values (like React components) can be interpolated using an XML syntax.
 
 ```jsx
-// T.$ Returns an array of React components
+// ["There's a ", <button>button</button>, " in my text!"]
 T.$("There's a <myButton /> in my text!", {
-     myButton: <button>button</button>
+     myButton: () => <button>button</button>
 })
 ```
 
-If your React components have string children, you can translate them inline. Pass in an array with a [React factory](https://facebook.github.io/react/docs/react-api.html#createfactory) and optional props.
+If your components have string children, you can translate them inline.
 
-```js
-T.$("<link>Visit your profile</link> to change your <strong>profile picture</strong>.", {
-    link: [React.createFactory("a"), { href: "/user/" + user.uuid }],
-    strong: [React.createFactory("strong")]
+```jsx
+// [
+//     <a href={"/user/" + user.uuid}>Visit your <strong>profile</strong></a>,
+//     " to change your profile picture."
+// ]
+T.$("<link>Visit your <strong>profile</strong></link> to change your profile picture.", {
+    link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
+    strong: (...children) => <strong>{...children}</strong>,
 })
 ```
 

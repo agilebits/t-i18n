@@ -1,4 +1,4 @@
-import { Replacements, ReactReplacements } from "./types";
+import { IcuReplacements, XmlReplacements } from "./types";
 
 const TOKEN = {
 	OPEN: '{',
@@ -9,11 +9,11 @@ const TOKEN = {
 //
 // message: (STRING | replacement)*
 // replacement: OPEN value CLOSE
-// value: STRING 
+// value: STRING
 
-export default function parseICU(icuString: string, replacements: Replacements|ReactReplacements):string {
+export default function parseIcu(icuString: string, replacements: IcuReplacements): string {
 	if (!replacements) return icuString;
-	
+
 	let currentToken = '';
 	let elements = [];
 	for (let i = 0; i < icuString.length; i++) {
@@ -30,6 +30,6 @@ export default function parseICU(icuString: string, replacements: Replacements|R
 			currentToken += icuString.charAt(i);
 		}
 	}
-	elements.push(currentToken);	
+	elements.push(currentToken);
 	return elements.join('');
 }
