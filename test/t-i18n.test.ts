@@ -91,22 +91,29 @@ describe("T", () => {
 
 describe("T.$", () => {
     const T = createI18n();
-    const factory = (...children) => ({ href: "https://google.com", children });
-    const element = factory("world");
 
     it("should replace an XML tag with the named function and pass inner string as children", () => {
-        const expected = ["Hello, ", element, "!"];
+        const expected = ["Hi, ", { href: "#", children: ["Joe"] }, "!"];
         const result = T.$(
-            "Hello, <link>world</link>!",
-            {},
-            { link: factory }
+            "Hi, <link>{name}</link>!",
+            {
+                link: (...children) => ({ href: "#", children }),
+                name: "Joe"
+            }
         );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
+
     it("should replace a self-closing tag", () => {
-        const expected = [element];
-        const result = T.$("<link />", {}, { link: () => element })
+        const expected = ["A ", { text: "B" }];
+        const result = T.$(
+            "{a} <b />",
+            {
+                a: "A",
+                b: () => ({ text: "B" })
+            }
+        );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });

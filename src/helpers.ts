@@ -1,3 +1,5 @@
+import { AnyReplacements, IcuReplacements, Mutable, XmlReplacements } from "./types";
+
 export interface PluralOptions {
 	other: string;
 	one?: string;
@@ -23,6 +25,22 @@ export function Plural(pluralizeFor: string, options: PluralOptions): string {
 			(zero ? "\t=0{" + zero + "}\n" : "") +
 			(one ? "\tone{" + one + "}\n" : "") +
 			("\tother{" + other + "}}");
+}
+
+export const splitReplacements = <T>(replacements: AnyReplacements<T>): [IcuReplacements, XmlReplacements<T>] => {
+	const icu: Mutable<IcuReplacements> = {};
+	const xml: Mutable<XmlReplacements<T>> = {};
+	for (const key in replacements) {
+		if (replacements.hasOwnProperty(key)) {
+			const value = replacements[key];
+			if (typeof value === "function") {
+				xml[key] = value;
+			} else {
+				icu[key] = value;
+			}
+		}
+	}
+	return [icu, xml];
 }
 
 // Based on the Object.assign polyfill at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign

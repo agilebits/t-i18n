@@ -1,6 +1,6 @@
-import { IcuReplacements, Messages, MFunc, SetupOptions, XmlReplacements } from "./types";
+import { IcuReplacements, Messages, MFunc, SetupOptions, XmlReplacements, AnyReplacements } from "./types";
 import createCachedFormatter, { CachedFormatter, numberFormatOptions, dateTimeFormatOptions} from "./format";
-import { Plural, generator, assign } from "./helpers";
+import { Plural, generator, assign, splitReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
 
@@ -23,7 +23,7 @@ export interface TFunc {
 	setup: (options?: SetupOptions) => any;
 	date: (value: any, formatName?: string, locale?: string) => string;
 	number: (value: any, formatName?: string, locale?: string) => string;
-	$: <T>(message: string, icuReplacements?: IcuReplacements, xmlReplacements?: XmlReplacements<T>, id?: string) => (T | string)[];
+	$: <T>(message: string, replacements?: AnyReplacements<T>, id?: string) => (T | string)[];
 	_i18nInstance?: I18n;
 }
 
@@ -109,9 +109,10 @@ function createT(context: I18n): TFunc {
 		lookup: context.lookup.bind(context),
 		date: context.format.bind(context, "date"),
 		number: context.format.bind(context, "number"),
-		$: function translateXml<T>(message: string, icuReplacements: IcuReplacements = {}, xmlReplacements: XmlReplacements<T> = {}, id?: string): (T | string)[] {
-			const translatedMessage = T(message, icuReplacements, id);
-			return parseXml(translatedMessage, xmlReplacements);
+		$: <T>(message: string, replacements: AnyReplacements<T> = {}, id?: string): (T | string)[] => {
+			const [icu, xml] = splitReplacements(replacements);
+			const translatedMessage = T(message, icu, id);
+			return parseXml(translatedMessage, xml);
 		},
 	};
 
