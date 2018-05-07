@@ -161,6 +161,15 @@ describe("T.$", () => {
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
+
+    it("should include children even if there is no replacement", () => {
+        const expected = ["Test: ", "text"];
+        const result = T.$(
+            "Test: <noformat>text</noformat>",
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
 });
 
 describe("T.date", () => {
