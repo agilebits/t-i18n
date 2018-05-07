@@ -162,10 +162,38 @@ describe("T.$", () => {
         expect(result).to.deep.equal(expected);
     });
 
-    it("should include children even if there is no replacement", () => {
-        const expected = ["Test: ", "text"];
+    it("should flatten children if replacement is missing", () => {
+        const expected = [
+            "Test ",
+            "A ",
+            { name: "format", children: ["B"] },
+        ];
         const result = T.$(
-            "Test: <noformat>text</noformat>",
+            "Test <noformat>A <format>B</format></noformat>",
+            {
+                format: (...children) => ({ name: "format", children })
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should ignore comments", () => {
+        const expected = ["Test: "];
+        const result = T.$(
+            "Test: <!-- comment -->",
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should not replace internal wrap element", () => {
+        const expected = ["Test"];
+        const result = T.$(
+            "Test",
+            {
+                wrap: (...children) => ({ name: "wrap", children })
+            }
         );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);

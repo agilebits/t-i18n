@@ -1,7 +1,6 @@
 import { XmlReplacements } from "./types";
 
-// Use a node name that someone else won't pick accidentally
-const XML_WRAPPER = "xml_wrapper_faeqcd"
+const XML_WRAPPER = "wrap";
 let parser: DOMParser;
 
 export default function parseXml<X>(xmlString: string, replacements: XmlReplacements<X>): (X | string)[] {
@@ -18,34 +17,30 @@ export default function parseXml<X>(xmlString: string, replacements: XmlReplacem
 		throw new Error("Could not parse XML string")
 	}
 
-	return walk(xmlDoc.firstChild, replacements);
+	return walk(xmlDoc.firstChild, replacements, true);
 }
 
-function walk<X>(node: Node, replacements: XmlReplacements<X>): (X | string)[] {
-	// node has no children
-	if (!node.childNodes || node.childNodes.length === 0) {
-		return (
-			replacements[node.nodeName]
-			// node is a self-closing tag
-			? [replacements[node.nodeName]()]
-			// node is a string
-			: [node.nodeValue || ""]
+// https://dom.spec.whatwg.org/#dom-node-nodetype
+const NODE_TYPE_ELEMENT = 1;
+const NODE_TYPE_TEXT = 3;
+
+function walk<X>(node: Node, replacements: XmlReplacements<X>, isRoot = false): (X | string)[] {
+	if (node.nodeType === NODE_TYPE_TEXT) {
+		return node.nodeValue ? [node.nodeValue] : [];
+	} else if (node.nodeType === NODE_TYPE_ELEMENT) {
+		const children: Node[] = Array.prototype.slice.call(node.childNodes);
+		const replacedChildren = children.reduce<(X | string)[]>(
+			(acc, child) => [...acc, ...walk(child, replacements)],
+			[]
 		);
+
+		return (
+			isRoot || !replacements[node.nodeName]
+			? replacedChildren
+			: [replacements[node.nodeName](...replacedChildren)]
+		);
+	} else {
+		// Ignore all other node types
+		return [];
 	}
-	// node is a tag with children
-	const children: Node[] = Array.prototype.slice.call(node.childNodes);
-	const replacedChildren = children.reduce<(X | string)[]>(
-		(acc, child) => [...acc, ...walk(child, replacements)],
-		[]
-	);
-
-	return replaceFunction(node.nodeName, replacedChildren, replacements)
-}
-
-function replaceFunction<X>(name: string, children: (X | string)[], replacements: XmlReplacements<X>): (X | string)[] {
-	return (
-		replacements[name]
-		? [replacements[name](...children)]
-		: children
-	);
 }
