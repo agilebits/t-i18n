@@ -29,8 +29,8 @@ export interface SetupOptions {
 	compiler?: Compiler;
 }
 
-export type Mutable<T> = {
-	[P in keyof T]: T[P];
+export type Mutable<X> = {
+	[P in keyof X]: X[P];
 }
 
 // { name: "Mitch", age: 10 }
@@ -39,10 +39,10 @@ export interface IcuReplacements {
 }
 
 // { strong: (txt) => $.strong({}, txt) }
-export interface XmlReplacements<T> {
-	readonly [s: string]: (...children: (T | string)[]) => T;
+export interface XmlReplacements<X> {
+	readonly [s: string]: (...children: (X | string)[]) => X;
 }
 
-export interface AnyReplacements<T> {
-	readonly [s: string]: string | number | ((...children: (T | string)[]) => T);
+export interface AnyReplacements<X> {
+	readonly [s: string]: string | number | ((...children: (X | string)[]) => X);
 }

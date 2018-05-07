@@ -4,7 +4,7 @@ import { XmlReplacements } from "./types";
 const XML_WRAPPER = "xml_wrapper_faeqcd"
 let parser: DOMParser;
 
-export default function parseXml<T>(xmlString: string, replacements: XmlReplacements<T>): (string | T)[] {
+export default function parseXml<X>(xmlString: string, replacements: XmlReplacements<X>): (X | string)[] {
 	if (typeof parser === 'undefined') {
 		parser = new DOMParser();
 	}
@@ -21,7 +21,7 @@ export default function parseXml<T>(xmlString: string, replacements: XmlReplacem
 	return walk(xmlDoc.firstChild, replacements);
 }
 
-function walk<T>(node: Node, replacements: XmlReplacements<T>): (T | string)[] {
+function walk<X>(node: Node, replacements: XmlReplacements<X>): (X | string)[] {
 	// node has no children
 	if (!node.childNodes || node.childNodes.length === 0) {
 		return (
@@ -34,7 +34,7 @@ function walk<T>(node: Node, replacements: XmlReplacements<T>): (T | string)[] {
 	}
 	// node is a tag with children
 	const children: Node[] = Array.prototype.slice.call(node.childNodes);
-	const replacedChildren = children.reduce<(T | string)[]>(
+	const replacedChildren = children.reduce<(X | string)[]>(
 		(acc, child) => [...acc, ...walk(child, replacements)],
 		[]
 	);
@@ -42,7 +42,7 @@ function walk<T>(node: Node, replacements: XmlReplacements<T>): (T | string)[] {
 	return replaceFunction(node.nodeName, replacedChildren, replacements)
 }
 
-function replaceFunction<T>(name: string, children: (T | string)[], replacements: XmlReplacements<T>): (T | string)[] {
+function replaceFunction<X>(name: string, children: (X | string)[], replacements: XmlReplacements<X>): (X | string)[] {
 	return (
 		replacements[name]
 		? [replacements[name](...children)]

@@ -23,7 +23,7 @@ export interface TFunc {
 	setup: (options?: SetupOptions) => any;
 	date: (value: any, formatName?: string, locale?: string) => string;
 	number: (value: any, formatName?: string, locale?: string) => string;
-	$: <T>(message: string, replacements?: AnyReplacements<T>, id?: string) => (T | string)[];
+	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
 	_i18nInstance?: I18n;
 }
 
@@ -109,7 +109,7 @@ function createT(context: I18n): TFunc {
 		lookup: context.lookup.bind(context),
 		date: context.format.bind(context, "date"),
 		number: context.format.bind(context, "number"),
-		$: <T>(message: string, replacements: AnyReplacements<T> = {}, id?: string): (T | string)[] => {
+		$: <X>(message: string, replacements: AnyReplacements<X> = {}, id?: string): (X | string)[] => {
 			const [icu, xml] = splitReplacements(replacements);
 			const translatedMessage = T(message, icu, id);
 			return parseXml(translatedMessage, xml);

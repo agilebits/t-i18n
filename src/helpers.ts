@@ -27,9 +27,9 @@ export function Plural(pluralizeFor: string, options: PluralOptions): string {
 			("\tother{" + other + "}}");
 }
 
-export const splitReplacements = <T>(replacements: AnyReplacements<T>): [IcuReplacements, XmlReplacements<T>] => {
+export const splitReplacements = <X>(replacements: AnyReplacements<X>): [IcuReplacements, XmlReplacements<X>] => {
 	const icu: Mutable<IcuReplacements> = {};
-	const xml: Mutable<XmlReplacements<T>> = {};
+	const xml: Mutable<XmlReplacements<X>> = {};
 	for (const key in replacements) {
 		if (replacements.hasOwnProperty(key)) {
 			const value = replacements[key];
