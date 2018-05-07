@@ -105,6 +105,50 @@ describe("T.$", () => {
         expect(result).to.deep.equal(expected);
     });
 
+    it("should replace nested XML tags", () => {
+        const expected = [
+            {
+                name: "a",
+                children: [
+                    "Visit your ",
+                    { name: "strong", children: ["profile"] }
+                ]
+            },
+            " to change your profile picture.",
+        ];
+        const result = T.$(
+            "<link>Visit your <bold>profile</bold></link> to change your profile picture.",
+            {
+                link: (...children) => ({ name: "a", children }),
+                bold: (...children) => ({ name: "strong", children }),
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should replace multiple identical XML tags", () => {
+        const expected = [
+            {
+                name: "strong",
+                children: ["Bold 1"]
+            },
+            " normal ",
+            {
+                name: "strong",
+                children: ["Bold 2"]
+            },
+        ];
+        const result = T.$(
+            "<bold>Bold 1</bold> normal <bold>Bold 2</bold>",
+            {
+                bold: (...children) => ({ name: "strong", children }),
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
     it("should replace a self-closing tag", () => {
         const expected = ["A ", { text: "B" }];
         const result = T.$(
