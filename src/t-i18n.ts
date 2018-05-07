@@ -1,6 +1,6 @@
-import { IcuReplacements, Messages, MFunc, SetupOptions, XmlReplacements, AnyReplacements } from "./types";
+import { IcuReplacements, Messages, MFunc, SetupOptions, AnyReplacements } from "./types";
 import createCachedFormatter, { CachedFormatter, numberFormatOptions, dateTimeFormatOptions} from "./format";
-import { Plural, generator, assign, splitReplacements } from "./helpers";
+import { generator, assign, splitReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
 
@@ -85,7 +85,7 @@ export class I18n {
 	}
 
 	setup(options: SetupOptions = {}): SetupOptions {
-		const {locale, idGenerator, messages, compiler} = options;
+		const { locale, idGenerator, messages } = options;
 		if (idGenerator) this.idGenerator = idGenerator;
 		if (locale) this.locale = locale;
 		if (messages) this.messages = messages;

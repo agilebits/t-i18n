@@ -1,4 +1,4 @@
-import { IcuReplacements, XmlReplacements } from "./types";
+import { IcuReplacements } from "./types";
 
 const TOKEN = {
 	OPEN: '{',

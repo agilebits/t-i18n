@@ -1,5 +1,4 @@
 import { XmlReplacements } from "./types";
-import { notDeepEqual } from "assert";
 
 // Use a node name that someone else won't pick accidentally
 const XML_WRAPPER = "xml_wrapper_faeqcd"

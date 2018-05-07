@@ -1,8 +1,10 @@
 {
-    
+
     "compilerOptions": {
         "module": "es2015",
-        "moduleResolution": "node",        
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "target": "es6",
         "removeComments": true,
         "declaration": true,
