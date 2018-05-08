@@ -5,11 +5,8 @@ import {T, makeT} from "../src/index";
 import {Plural, generator} from "../src/helpers";
 import {dateTimeFormatOptions, numberFormatOptions} from "../src/format";
 
-import * as DOM from "react-dom-factories";
-import * as React from "react";
-
 // Shim for DOM XML parser
-import {DOMParser } from "xmldom";
+import { DOMParser } from "xmldom";
 global['DOMParser'] = DOMParser;
 global['Node'] = {
     ELEMENT_NODE: 1
@@ -20,7 +17,7 @@ describe("Plural", () => {
                             "\t=0{0 minutes}\n" +
                             "\tone{1 minute}\n" +
                             "\tother{# minutes}}";
-                            
+
     it("should print a formatted plural string", () => {
         const result = Plural("numMinutes", {
             one: "1 minute",
@@ -94,23 +91,110 @@ describe("T", () => {
 
 describe("T.$", () => {
     const T = createI18n();
-    const factory = DOM.a;
-    const props = {href: "https://google.com"};
-    const element = factory(props, "world");
-    
-    it("should replace a react component factory and pass inner string as children", () => {
-        const expected = ["Hello, ", element, "!"];
-        const result = T.$("Hello, <link>world</link>!", {
-            link: [factory, props]
-        });
+
+    it("should replace an XML tag with the named function and pass inner string as children", () => {
+        const expected = ["Hi, ", { href: "#", children: ["Joe"] }, "!"];
+        const result = T.$(
+            "Hi, <link>{name}</link>!",
+            {
+                link: (...children) => ({ href: "#", children }),
+                name: "Joe"
+            }
+        );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
-    it("should replace a react component", () => {
-        const expected = [element];
-        const result = T.$("<link />", {
-            link: element
-        })
+
+    it("should replace nested XML tags", () => {
+        const expected = [
+            {
+                name: "a",
+                children: [
+                    "Visit your ",
+                    { name: "strong", children: ["profile"] }
+                ]
+            },
+            " to change your profile picture.",
+        ];
+        const result = T.$(
+            "<link>Visit your <bold>profile</bold></link> to change your profile picture.",
+            {
+                link: (...children) => ({ name: "a", children }),
+                bold: (...children) => ({ name: "strong", children }),
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should replace multiple identical XML tags", () => {
+        const expected = [
+            {
+                name: "strong",
+                children: ["Bold 1"]
+            },
+            " normal ",
+            {
+                name: "strong",
+                children: ["Bold 2"]
+            },
+        ];
+        const result = T.$(
+            "<bold>Bold 1</bold> normal <bold>Bold 2</bold>",
+            {
+                bold: (...children) => ({ name: "strong", children }),
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should replace a self-closing tag", () => {
+        const expected = ["A ", { text: "B" }];
+        const result = T.$(
+            "{a} <b />",
+            {
+                a: "A",
+                b: () => ({ text: "B" })
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should flatten children if replacement is missing", () => {
+        const expected = [
+            "Test ",
+            "A ",
+            { name: "format", children: ["B"] },
+        ];
+        const result = T.$(
+            "Test <noformat>A <format>B</format></noformat>",
+            {
+                format: (...children) => ({ name: "format", children })
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should ignore comments", () => {
+        const expected = ["Test: "];
+        const result = T.$(
+            "Test: <!-- comment -->",
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should not replace internal wrap element", () => {
+        const expected = ["Test"];
+        const result = T.$(
+            "Test",
+            {
+                wrap: (...children) => ({ name: "wrap", children })
+            }
+        );
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
@@ -127,7 +211,7 @@ describe("T.date", () => {
         const expected = new Intl.DateTimeFormat("it", dateTimeFormatOptions.default).format(date);
         [null, 'default', 'nonexistent'].forEach(format => {
             const result = T.date(date, format);
-            expect(result).to.equal(expected);            
+            expect(result).to.equal(expected);
         });
     });
 
@@ -158,7 +242,7 @@ describe("T.number", () => {
         const expected = new Intl.NumberFormat("he", numberFormatOptions.default).format(number);
         [null, 'default', 'nonexistent'].forEach(format => {
             const result = T.number(number, format);
-            expect(result).to.equal(expected);            
+            expect(result).to.equal(expected);
         });
     });
 
