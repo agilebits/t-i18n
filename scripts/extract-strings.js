@@ -79,9 +79,9 @@ function runner(err, files) {
         output(sort(allMessages), outPath);
     });
 }
-function sort(obj, sortFn = null) {
+function sort(obj) {
     let sorted = {};
-    Object.keys(obj).sort(sortFn).forEach(function (key) {
+    Object.keys(obj).sort().forEach(function (key) {
         sorted[key] = obj[key];
     });
     return sorted;
