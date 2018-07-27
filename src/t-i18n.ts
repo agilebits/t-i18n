@@ -1,12 +1,12 @@
 import { IcuReplacements, Messages, MFunc, SetupOptions, AnyReplacements } from "./types";
 import createCachedFormatter, { CachedFormatter, numberFormatOptions, dateTimeFormatOptions} from "./format";
-import { generator, assign, splitReplacements } from "./helpers";
+import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
 
 /**
  * T-i18n - lightweight localization
- * v0.4.1
+ * v0.5.0
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
@@ -110,7 +110,7 @@ function createT(context: I18n): TFunc {
 		date: context.format.bind(context, "date"),
 		number: context.format.bind(context, "number"),
 		$: <X>(message: string, replacements: AnyReplacements<X> = {}, id?: string): (X | string)[] => {
-			const [icu, xml] = splitReplacements(replacements);
+			const [icu, xml] = splitAndEscapeReplacements(replacements);
 			const translatedMessage = T(message, icu, id);
 			return parseXml(translatedMessage, xml);
 		},

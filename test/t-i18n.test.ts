@@ -198,6 +198,39 @@ describe("T.$", () => {
         expect(result).to.be.an('array');
         expect(result).to.deep.equal(expected);
     });
+
+    it("should interpret XML entities", () => {
+        const expected = [
+            { name: "a", children: ["A < B"] },
+            ">\"&''",
+        ];
+        const result = T.$(
+            "<a>A &lt; B</a>&gt;&quot;&amp;&#39;&apos;",
+            {
+                a: (...children) => ({ name: "a", children }),
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
+
+    it("should handle unescaped XML entities in ICU replacements", () => {
+        const expected = [
+            { name: "a", children: ["Jo & Joe <3"] },
+            " <script> // John \"Bud\" O'Connor",
+        ];
+        const result = T.$(
+            "<a>{test1}</a> {test2} // {test3}",
+            {
+                a: (...children) => ({ name: "a", children }),
+                test1: "Jo & Joe <3",
+                test2: "<script>",
+                test3: "John \"Bud\" O'Connor",
+            }
+        );
+        expect(result).to.be.an('array');
+        expect(result).to.deep.equal(expected);
+    });
 });
 
 describe("T.date", () => {
