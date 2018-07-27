@@ -1,6 +1,6 @@
 import { IcuReplacements, Messages, MFunc, SetupOptions, AnyReplacements } from "./types";
 import createCachedFormatter, { CachedFormatter, numberFormatOptions, dateTimeFormatOptions} from "./format";
-import { generator, assign, splitReplacements } from "./helpers";
+import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
 
@@ -110,7 +110,7 @@ function createT(context: I18n): TFunc {
 		date: context.format.bind(context, "date"),
 		number: context.format.bind(context, "number"),
 		$: <X>(message: string, replacements: AnyReplacements<X> = {}, id?: string): (X | string)[] => {
-			const [icu, xml] = splitReplacements(replacements);
+			const [icu, xml] = splitAndEscapeReplacements(replacements);
 			const translatedMessage = T(message, icu, id);
 			return parseXml(translatedMessage, xml);
 		},

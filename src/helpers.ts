@@ -27,7 +27,19 @@ export function Plural(pluralizeFor: string, options: PluralOptions): string {
 			("\tother{" + other + "}}");
 }
 
-export const splitReplacements = <X>(replacements: AnyReplacements<X>): [IcuReplacements, XmlReplacements<X>] => {
+const xmlEscapes: { [key: string]: string } = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	"\"": "&quot;",
+	"'": '&#39;'
+};
+
+const escapeXml = (str: string) => (
+	str.replace(/[&<>"']/g, (match) => xmlEscapes[match])
+);
+
+export const splitAndEscapeReplacements = <X>(replacements: AnyReplacements<X>): [IcuReplacements, XmlReplacements<X>] => {
 	const icu: Mutable<IcuReplacements> = {};
 	const xml: Mutable<XmlReplacements<X>> = {};
 	for (const key in replacements) {
@@ -35,6 +47,8 @@ export const splitReplacements = <X>(replacements: AnyReplacements<X>): [IcuRepl
 			const value = replacements[key];
 			if (typeof value === "function") {
 				xml[key] = value;
+			} else if (typeof value === "string") {
+				icu[key] = escapeXml(value);
 			} else {
 				icu[key] = value;
 			}
