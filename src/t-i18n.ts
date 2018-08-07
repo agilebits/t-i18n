@@ -6,7 +6,7 @@ import parseXml from "./xml";
 
 /**
  * T-i18n - lightweight localization
- * v0.5.0
+ * v0.5.1
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
