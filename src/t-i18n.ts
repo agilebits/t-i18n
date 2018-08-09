@@ -18,13 +18,13 @@ import parseXml from "./xml";
 
 export interface TFunc {
 	(message: string, replacements?: IcuReplacements, id?: string): string;
+	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
+	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
 	generateId: (message: string) => string;
 	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
-	setup: (options?: SetupOptions) => any;
-	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
 	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
-	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
+	setup: (options?: SetupOptions) => any;
 }
 
 const defaultLanguage = "en";
