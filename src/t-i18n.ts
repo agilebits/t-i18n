@@ -10,6 +10,10 @@ import parseXml from "./xml";
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
+ *
+ *
+ * Made by Mitch Cohen and Rob Yoder
+ * First released on July 31, 2017
  */
 
 export interface TFunc {
