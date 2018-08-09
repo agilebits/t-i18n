@@ -1,14 +1,14 @@
 /// <reference path="../node_modules/@types/mocha/index.d.ts" />
 
 import { expect } from "chai";
-import {T, makeT} from "../src/index";
-import {Plural, generator} from "../src/helpers";
-import {dateTimeFormatOptions, numberFormatOptions} from "../src/format";
+import { makeT } from "../src/index";
+import { Plural, generator } from "../src/helpers";
+import { dateTimeFormats, numberFormats } from "../src/format";
 
 // Shim for DOM XML parser
 import { DOMParser } from "xmldom";
-global['DOMParser'] = DOMParser;
-global['Node'] = {
+global["DOMParser"] = DOMParser;
+global["Node"] = {
     ELEMENT_NODE: 1
 };
 
@@ -30,7 +30,7 @@ describe("Plural", () => {
 });
 
 describe("T", () => {
-    const T = createI18n();
+    const T = makeT();
     const messages = {
         en: {
             "Hello--world": () => "Hello, world",
@@ -47,7 +47,7 @@ describe("T", () => {
             "not-compiled": "No compilado",
         }
     }
-    T.setup({
+    T.set({
         locale: "es",
         messages: messages,
         idGenerator: generator.hyphens
@@ -86,11 +86,12 @@ describe("T", () => {
     it("should compile a string message with replacements", () => {
         const expected = "Howdy, Mitch";
         const result = T("Howdy, {name}", {name: "Mitch"});
+        expect(result).to.equal(expected);
     });
 });
 
 describe("T.$", () => {
-    const T = createI18n();
+    const T = makeT();
 
     it("should replace an XML tag with the named function and pass inner string as children", () => {
         const expected = ["Hi, ", { href: "#", children: ["Joe"] }, "!"];
@@ -101,7 +102,7 @@ describe("T.$", () => {
                 name: "Joe"
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -123,7 +124,7 @@ describe("T.$", () => {
                 bold: (...children) => ({ name: "strong", children }),
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -145,7 +146,7 @@ describe("T.$", () => {
                 bold: (...children) => ({ name: "strong", children }),
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -158,7 +159,7 @@ describe("T.$", () => {
                 b: () => ({ text: "B" })
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -174,7 +175,7 @@ describe("T.$", () => {
                 format: (...children) => ({ name: "format", children })
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -183,7 +184,7 @@ describe("T.$", () => {
         const result = T.$(
             "Test: <!-- comment -->",
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -195,7 +196,7 @@ describe("T.$", () => {
                 wrap: (...children) => ({ name: "wrap", children })
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -210,7 +211,7 @@ describe("T.$", () => {
                 a: (...children) => ({ name: "a", children }),
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 
@@ -228,36 +229,54 @@ describe("T.$", () => {
                 test3: "John \"Bud\" O'Connor",
             }
         );
-        expect(result).to.be.an('array');
+        expect(result).to.be.an("array");
         expect(result).to.deep.equal(expected);
     });
 });
 
+describe("T.locale", () => {
+    const T = makeT();
+
+    it("should have default locale", () => {
+        expect(T.locale()).to.equal("en");
+    });
+
+    it("should return updated locale", () => {
+        T.set({ locale: "it" });
+        expect(T.locale()).to.equal("it");
+    });
+
+    it("should return twice updated locale", () => {
+        T.set({ locale: "de" });
+        expect(T.locale()).to.equal("de");
+    });
+});
+
 describe("T.date", () => {
-    const T = createI18n();
-    T.setup({
+    const T = makeT();
+    T.set({
         locale: "it"
     });
 
     it("should print a localized date using the default format", () => {
         const date = Date.now();
-        const expected = new Intl.DateTimeFormat("it", dateTimeFormatOptions.default).format(date);
-        [null, 'default', 'nonexistent'].forEach(format => {
-            const result = T.date(date, format);
+        const expected = new Intl.DateTimeFormat("it", dateTimeFormats.long).format(date);
+        [null, "long", "nonexistent"].forEach((format) => {
+            const result = T.date(date, format as any);
             expect(result).to.equal(expected);
         });
     });
 
     it("should print a localized 'short' date", () => {
         const date = Date.now();
-        const expected = new Intl.DateTimeFormat("it", dateTimeFormatOptions.short).format(date);
+        const expected = new Intl.DateTimeFormat("it", dateTimeFormats.short).format(date);
         const result = T.date(date, "short");
         expect(result).to.equal(expected);
     });
 
     it("should print a date in the provided locale", () => {
         const date = Date.now();
-        const expected = new Intl.DateTimeFormat("ru", dateTimeFormatOptions.default).format(date);
+        const expected = new Intl.DateTimeFormat("ru", dateTimeFormats.long).format(date);
         const result = T.date(date, null, "ru");
         expect(result).to.equal(expected);
     });
@@ -265,36 +284,31 @@ describe("T.date", () => {
 
 
 describe("T.number", () => {
-    const T = createI18n();
-    T.setup({
+    const T = makeT();
+    T.set({
         locale: "he"
     });
 
     it("should print a localized number using the default (decimal) format", () => {
         const number = 15;
-        const expected = new Intl.NumberFormat("he", numberFormatOptions.default).format(number);
-        [null, 'default', 'nonexistent'].forEach(format => {
-            const result = T.number(number, format);
+        const expected = new Intl.NumberFormat("he", numberFormats.decimal).format(number);
+        [null, "decimal", "nonexistent"].forEach((format) => {
+            const result = T.number(number, format as any);
             expect(result).to.equal(expected);
         });
     });
 
     it("should print a localized currency value in USD", () => {
         const number = 10.5;
-        const expected = new Intl.NumberFormat("he", numberFormatOptions.currency).format(number);
+        const expected = new Intl.NumberFormat("he", numberFormats.currency).format(number);
         const result = T.number(number, "currency");
         expect(result).to.equal(expected);
     });
 
     it("should print a number in the provided locale", () => {
         const number = 25;
-        const expected = new Intl.NumberFormat("ko", numberFormatOptions.default).format(number);
+        const expected = new Intl.NumberFormat("ko", numberFormats.decimal).format(number);
         const result = T.number(number, null, "ko");
         expect(result).to.equal(expected);
     });
 });
-
-
-function createI18n() {
-    return makeT();
-}

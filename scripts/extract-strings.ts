@@ -15,7 +15,7 @@ const helpers = {
 function evaluate(node: any, src: any): any {
     if (!node) return null;
     if (node.text) return node.text;
-    
+
     const expression = (node as ts.Node).getFullText(src);
 
     // evil eval
@@ -35,18 +35,18 @@ function findMethodCall(objectName: string, methodName: string, src: ts.Node) {
             const call = node as ts.CallExpression;
 
             if (call.expression.kind && call.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
-                
+
                 const methodCall = (call.expression as ts.PropertyAccessExpression),
                         obj = (methodCall.expression as ts.Identifier),
                         method = (methodCall.name as ts.Identifier);
 
                 if (obj.text === objectName && method.text === methodName) {
-                    res.push(node);    
+                    res.push(node);
                 }
             }
         }
 
-        return ts.forEachChild(node, find);    
+        return ts.forEachChild(node, find);
     }
     return res;
 }
@@ -56,7 +56,7 @@ function findFunctionCall(tagName: string, src: ts.Node) {
     find(src);
     function find(node: ts.Node) {
         if (!node) return;
-        
+
         if (node.kind === ts.SyntaxKind.CallExpression) {
             const call = (node as ts.CallExpression),
                 expression = call.expression,
@@ -65,20 +65,20 @@ function findFunctionCall(tagName: string, src: ts.Node) {
                     res.push(node);
                 }
         }
-    
-        return ts.forEachChild(node, find);    
+
+        return ts.forEachChild(node, find);
     }
     return res;
 }
 
 function extractMessages(contents: string) {
-    const srcFile = ts.createSourceFile("file.ts", contents, ts.ScriptTarget.ES2017, false, ts.ScriptKind.TSX);    
+    const srcFile = ts.createSourceFile("file.ts", contents, ts.ScriptTarget.ES2017, false, ts.ScriptKind.TSX);
     const tCalls = [...findFunctionCall("T", srcFile), ...findMethodCall("T", "$", srcFile)];
     let messages = {}
     tCalls.forEach(c => {
         const [message, values, id] = c.arguments;
         const evaluatedMessage = evaluate(message, srcFile);
-        let idText = id ? id.text : T._i18nInstance.generateId(evaluatedMessage);
+        let idText = id ? id.text : T.generateId(evaluatedMessage);
         messages[idText] = evaluatedMessage;
     })
     return messages;
