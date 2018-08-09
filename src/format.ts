@@ -39,7 +39,7 @@ export const numberFormats = {
 
 // Create cached versions of Intl.DateTimeFormat and Intl.NumberFormat
 export default function createCachedFormatter<X extends IntlFormat>(intlFormat: IntlFormatType<X>): CachedFormatter<X> {
-	let cache: any = {};
+	const cache: { [key: string]: X } = {};
 
 	return function (locale: string, formatOptions?: IntlFormatOptions<X>): X {
 		const args = Array.prototype.slice.call(arguments);
