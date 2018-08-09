@@ -26,7 +26,6 @@ export interface SetupOptions {
 	messages?: Messages;
 	locale?: string;
 	idGenerator?: (message: string) => string;
-	compiler?: Compiler;
 }
 
 export type Mutable<X> = {

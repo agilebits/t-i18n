@@ -1,132 +1,103 @@
 import { IcuReplacements, Messages, MFunc, SetupOptions, AnyReplacements } from "./types";
-import createCachedFormatter, { CachedFormatter, numberFormatOptions, dateTimeFormatOptions} from "./format";
+import createCachedFormatter, { numberFormats, dateTimeFormats} from "./format";
 import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
 
 /**
  * T-i18n - lightweight localization
- * v0.5.0
+ * v0.6.0
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
- *
- *
- * Cobbled together by Mitch Cohen on July 31, 2017
  */
 
-// T is exported instead of the underlying instance to allow calls to T("Message to translate")
-//
 export interface TFunc {
 	(message: string, replacements?: IcuReplacements, id?: string): string;
+	generateId: (message: string) => string;
+	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
 	setup: (options?: SetupOptions) => any;
-	date: (value: any, formatName?: string, locale?: string) => string;
-	number: (value: any, formatName?: string, locale?: string) => string;
+	date: (value: any, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
+	number: (value: any, formatName?: keyof typeof numberFormats, locale?: string) => string;
 	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
-	_i18nInstance?: I18n;
 }
 
-export const defaultLanguage = "en";
+const defaultLanguage = "en";
 
-export class I18n {
-	locale: string = "en";
-	messages: Messages = {};
-	idGenerator: (message: string) => string = generator.hyphens;
-	dateFormatter: CachedFormatter;
-	numberFormatter: CachedFormatter;
+const getKey = (allMessages: Messages, locale: string, key: string): MFunc | string => {
+	const messages = allMessages[locale];
+	const defaultMessages = allMessages[defaultLanguage];
 
-	static defaultSetup: SetupOptions = {
-		messages: {},
-		locale: defaultLanguage,
-		idGenerator: generator.hyphens
+	if (messages && messages[key]) {
+		return messages[key];
+	}
+	if (defaultMessages && defaultMessages[key]) {
+		return defaultMessages[key];
 	}
 
-	constructor(options?: SetupOptions) {
-		this.setup({...I18n.defaultSetup, ...options});
+	return "";
+}
 
-		this.dateFormatter = createCachedFormatter(Intl.DateTimeFormat);
-		this.numberFormatter= createCachedFormatter(Intl.NumberFormat);
+export const makeT = (): TFunc => {
+	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
+	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(Intl.NumberFormat);
+
+	let messages: Messages = {};
+	let locale = defaultLanguage;
+	let idGenerator = generator.hyphens;
+
+	const setup = (options: SetupOptions = {}): SetupOptions => {
+		messages = options.messages || messages;
+		locale = options.locale || locale;
+		idGenerator = options.idGenerator || idGenerator;
+
+		return { messages, locale, idGenerator };
 	}
 
-	format(type: string, value: number|Date, formatStyle?: string, locale: string = this.locale) {
-		const options = (type === "date") ? dateTimeFormatOptions : numberFormatOptions;
-		const formatter = (type === "date") ? this.dateFormatter : this.numberFormatter;
-		const optionsForFormatStyle = formatStyle ? (options[formatStyle] || options.default) : options.default;
-
-		return formatter.call(this, locale, optionsForFormatStyle).format(value);
+	const date = (value: Date, style: keyof typeof dateTimeFormats = "long", dateLocale = locale) => {
+		const format = dateTimeFormats[style] || dateTimeFormats.long;
+		return dateFormatter(dateLocale, format).format(value);
 	}
 
-	getKey(key: string, locale: string = this.locale):MFunc|String {
-		const messages = this.messages[locale];
-		const defaultMessages = this.messages[defaultLanguage];
-
-		if (messages && messages[key]) {
-			return messages[key];
-		}
-		if (defaultMessages && defaultMessages[key]) {
-			return defaultMessages[key];
-		}
-
-		return "";
+	const number = (value: number, style: keyof typeof numberFormats = "decimal", numberLocale = locale) => {
+		const format = numberFormats[style] || numberFormats.decimal;
+		return numberFormatter(numberLocale, format).format(value);
 	}
 
-	generateId(message: string): string {
-		return this.idGenerator(message);
-	}
+	const generateId = (message: string) => idGenerator(message);
 
-	lookup(id: string, replacements: IcuReplacements = {}, defaultMessage = ""):string {
-		const translation = this.getKey(id, this.locale) || defaultMessage || id;
+	const lookup = (id: string, replacements: IcuReplacements = {}, defaultMessage = ""): string => {
+		const translation = getKey(messages, locale, id) || defaultMessage || id;
 		if (typeof translation === "string") {
 			return parseIcu(translation, replacements);
 		}
 
-		return (<MFunc>translation)(replacements);
+		return translation(replacements);
 	}
 
-	setup(options: SetupOptions = {}): SetupOptions {
-		const { locale, idGenerator, messages } = options;
-		if (idGenerator) this.idGenerator = idGenerator;
-		if (locale) this.locale = locale;
-		if (messages) this.messages = messages;
-
-		return {
-			messages: this.messages,
-			locale: this.locale,
-			idGenerator: this.idGenerator
-		};
+	const T = (message: string, replacements: IcuReplacements = {}, id = ""): string => {
+		return lookup(id || generateId(message), replacements, message);
 	}
-}
 
-function createT(context: I18n): TFunc {
-	const T = (message: string, replacements?: IcuReplacements, id?: string): string => {
-		if (!id) id = context.generateId(message);
-		return context.lookup(id, replacements, message);
+	const $ = <X>(message: string, replacements: AnyReplacements<X> = {}, id = ""): (X | string)[] => {
+		const [icu, xml] = splitAndEscapeReplacements(replacements);
+		const translatedMessage = T(message, icu, id);
+		return parseXml(translatedMessage, xml);
 	}
+
 	const properties = {
-		_i18nInstance: context,
-		setup: context.setup.bind(context),
-		lookup: context.lookup.bind(context),
-		date: context.format.bind(context, "date"),
-		number: context.format.bind(context, "number"),
-		$: <X>(message: string, replacements: AnyReplacements<X> = {}, id?: string): (X | string)[] => {
-			const [icu, xml] = splitAndEscapeReplacements(replacements);
-			const translatedMessage = T(message, icu, id);
-			return parseXml(translatedMessage, xml);
-		},
+		$,
+		date,
+		generateId,
+		locale: () => locale,
+		lookup,
+		number,
+		setup,
 	};
 
 	return assign(T, properties);
 }
 
-export function i18nNamespace(): TFunc  {
-	let i18nInstance: I18n = new I18n();
-
-	return createT(i18nInstance);
-}
-
 // singleton (T)
-export default i18nNamespace();
-
-// or roll your own
-export const makeT = i18nNamespace;
+export default makeT();

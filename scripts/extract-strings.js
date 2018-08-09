@@ -64,7 +64,7 @@ function extractMessages(contents) {
     tCalls.forEach(c => {
         const [message, values, id] = c.arguments;
         const evaluatedMessage = evaluate(message, srcFile);
-        let idText = id ? id.text : index_1.T._i18nInstance.generateId(evaluatedMessage);
+        let idText = id ? id.text : index_1.T.generateId(evaluatedMessage);
         messages[idText] = evaluatedMessage;
     });
     return messages;
