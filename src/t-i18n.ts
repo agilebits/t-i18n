@@ -1,4 +1,4 @@
-import { IcuReplacements, Messages, MFunc, SetupOptions, AnyReplacements } from "./types";
+import { IcuReplacements, Messages, MFunc, Config, AnyReplacements } from "./types";
 import createCachedFormatter, { numberFormats, dateTimeFormats} from "./format";
 import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
@@ -24,7 +24,7 @@ export interface TFunc {
 	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
 	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
-	setup: (options?: SetupOptions) => any;
+	set: (options?: Partial<Config>) => Config;
 }
 
 const defaultLanguage = "en";
@@ -51,7 +51,7 @@ export const makeT = (): TFunc => {
 	let locale = defaultLanguage;
 	let idGenerator = generator.hyphens;
 
-	const setup = (options: SetupOptions = {}): SetupOptions => {
+	const set = (options: Partial<Config> = {}): Config => {
 		messages = options.messages || messages;
 		locale = options.locale || locale;
 		idGenerator = options.idGenerator || idGenerator;
@@ -97,7 +97,7 @@ export const makeT = (): TFunc => {
 		locale: () => locale,
 		lookup,
 		number,
-		setup,
+		set,
 	};
 
 	return assign(T, properties);

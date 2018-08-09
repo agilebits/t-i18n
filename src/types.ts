@@ -22,10 +22,10 @@ export interface Messages {
 	[s: string]: {[s: string]: string|MFunc}
 }
 
-export interface SetupOptions {
-	messages?: Messages;
-	locale?: string;
-	idGenerator?: (message: string) => string;
+export interface Config {
+	messages: Messages;
+	locale: string;
+	idGenerator: (message: string) => string;
 }
 
 export type Mutable<X> = {

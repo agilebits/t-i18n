@@ -47,7 +47,7 @@ describe("T", () => {
             "not-compiled": "No compilado",
         }
     }
-    T.setup({
+    T.set({
         locale: "es",
         messages: messages,
         idGenerator: generator.hyphens
@@ -242,19 +242,19 @@ describe("T.locale", () => {
     });
 
     it("should return updated locale", () => {
-        T.setup({ locale: "it" });
+        T.set({ locale: "it" });
         expect(T.locale()).to.equal("it");
     });
 
     it("should return twice updated locale", () => {
-        T.setup({ locale: "de" });
+        T.set({ locale: "de" });
         expect(T.locale()).to.equal("de");
     });
 });
 
 describe("T.date", () => {
     const T = makeT();
-    T.setup({
+    T.set({
         locale: "it"
     });
 
@@ -285,7 +285,7 @@ describe("T.date", () => {
 
 describe("T.number", () => {
     const T = makeT();
-    T.setup({
+    T.set({
         locale: "he"
     });
 

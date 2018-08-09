@@ -29,7 +29,7 @@ Translate the JSON files:
 Then load the translations, pass them to `T` and set the locale.
 
 ```js
-T.setup({
+T.set({
     locale: "es",
     messages: {
         en: englishJSON,
@@ -94,7 +94,7 @@ T.$(
 
 ## Pluralization and advanced ICU syntax
 
-To get locale-aware pluralization, you should [precompile your translations](https://messageformat.github.io/build/) using an ICU-compliant tool. Then pass the compiled messages to `T.setup` instead of strings.
+To get locale-aware pluralization, you should [precompile your translations](https://messageformat.github.io/build/) using an ICU-compliant tool. Then pass the compiled messages to `T.set` instead of strings.
 
 ```js
 // Pluralization with ICU syntax
