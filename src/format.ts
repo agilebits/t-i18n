@@ -1,8 +1,8 @@
 // Format functions accept both date and number formatters
 export type IntlFormat = Intl.DateTimeFormat|Intl.NumberFormat;
-export type IntlFormatType<T extends IntlFormat> = T extends Intl.DateTimeFormat ? typeof Intl.DateTimeFormat : typeof Intl.NumberFormat;
-export type IntlFormatOptions<T extends IntlFormat> = T extends Intl.DateTimeFormat ? Intl.DateTimeFormatOptions : Intl.NumberFormatOptions;
-export type CachedFormatter<T extends IntlFormat> = (locale: string, formatOptions?: IntlFormatOptions<T>) => T;
+export type IntlFormatType<X extends IntlFormat> = X extends Intl.DateTimeFormat ? typeof Intl.DateTimeFormat : typeof Intl.NumberFormat;
+export type IntlFormatOptions<X extends IntlFormat> = X extends Intl.DateTimeFormat ? Intl.DateTimeFormatOptions : Intl.NumberFormatOptions;
+export type CachedFormatter<X extends IntlFormat> = (locale: string, formatOptions?: IntlFormatOptions<X>) => X;
 
 export const dateTimeFormats = {
 	short: {
@@ -38,15 +38,15 @@ export const numberFormats = {
 }
 
 // Create cached versions of Intl.DateTimeFormat and Intl.NumberFormat
-export default function createCachedFormatter<T extends IntlFormat>(intlFormat: IntlFormatType<T>): CachedFormatter<T> {
+export default function createCachedFormatter<X extends IntlFormat>(intlFormat: IntlFormatType<X>): CachedFormatter<X> {
 	let cache: any = {};
 
-	return function (locale: string, formatOptions?: IntlFormatOptions<T>): T {
+	return function (locale: string, formatOptions?: IntlFormatOptions<X>): X {
 		const args = Array.prototype.slice.call(arguments);
 		const id = locale + "-" + JSON.stringify(formatOptions);
 		if (id in cache) return cache[id];
 
-		const formatter: T = new (Function.prototype.bind.call(
+		const formatter: X = new (Function.prototype.bind.call(
 			intlFormat, null, ...args
 		));
 
