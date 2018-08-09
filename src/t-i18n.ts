@@ -22,8 +22,8 @@ export interface TFunc {
 	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
 	setup: (options?: SetupOptions) => any;
-	date: (value: any, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
-	number: (value: any, formatName?: keyof typeof numberFormats, locale?: string) => string;
+	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
+	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
 	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
 }
 
@@ -59,7 +59,7 @@ export const makeT = (): TFunc => {
 		return { messages, locale, idGenerator };
 	}
 
-	const date = (value: Date, style: keyof typeof dateTimeFormats = "long", dateLocale = locale) => {
+	const date = (value: Date | number, style: keyof typeof dateTimeFormats = "long", dateLocale = locale) => {
 		const format = dateTimeFormats[style] || dateTimeFormats.long;
 		return dateFormatter(dateLocale, format).format(value);
 	}
