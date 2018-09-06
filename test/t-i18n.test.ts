@@ -1,9 +1,9 @@
 /// <reference path="../node_modules/@types/mocha/index.d.ts" />
 
 import { expect } from "chai";
-import { makeT } from "../src/index";
-import { Plural, generator } from "../src/helpers";
+import { makeBasicT, makeT, Plural, generator, T as globalT } from "../src";
 import { dateTimeFormats, numberFormats } from "../src/format";
+import { BasicTFunc, TFunc } from "../src/t-i18n";
 
 // Shim for DOM XML parser
 import { DOMParser } from "xmldom";
@@ -29,8 +29,7 @@ describe("Plural", () => {
     });
 });
 
-describe("T", () => {
-    const T = makeT();
+const runBasicTTests = (T: BasicTFunc) => {
     const messages = {
         en: {
             "Hello--world": () => "Hello, world",
@@ -88,6 +87,43 @@ describe("T", () => {
         const result = T("Howdy, {name}", {name: "Mitch"});
         expect(result).to.equal(expected);
     });
+}
+
+const itShouldHaveFormatters = (T: TFunc) => {
+    it("should have date function", () => {
+        expect(typeof T.date).to.equal("function");
+    });
+
+    it("should have number function", () => {
+        expect(typeof T.number).to.equal("function");
+    });
+}
+
+const itShouldNotHaveFormatters = (T: BasicTFunc) => {
+    it("should not have date function", () => {
+        expect("date" in T).to.equal(false);
+    });
+
+    it("should not have number function", () => {
+        expect("number" in T).to.equal(false);
+    });
+}
+
+describe("global T", () => {
+    runBasicTTests(globalT);
+    itShouldHaveFormatters(globalT);
+});
+
+describe("T from makeT", () => {
+    const T = makeT();
+    runBasicTTests(T);
+    itShouldHaveFormatters(T);
+});
+
+describe("T from makeBasicT", () => {
+    const T = makeBasicT();
+    runBasicTTests(T);
+    itShouldNotHaveFormatters(T);
 });
 
 describe("T.$", () => {
