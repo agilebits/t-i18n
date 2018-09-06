@@ -6,7 +6,7 @@ import parseXml from "./xml";
 
 /**
  * T-i18n - lightweight localization
- * v0.6.0
+ * v0.6.1
  *
  * T-i18n defers to standards to do the hard work of localization. The browser Intl API is use to format
  * dates and numbers. Messages are provided as functions rather than strings, so they can be compiled at build time.
@@ -15,17 +15,20 @@ import parseXml from "./xml";
  * Made by Mitch Cohen and Rob Yoder
  * First released on July 31, 2017
  */
-
-export interface TFunc {
+export interface BasicTFunc {
 	(message: string, replacements?: IcuReplacements, id?: string): string;
 	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
-	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
 	generateId: (message: string) => string;
 	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
-	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
 	set: (options?: Partial<Config>) => Config;
 }
+
+export interface IntlFormatters {
+	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
+	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
+}
+export type TFunc = BasicTFunc & IntlFormatters;
 
 const defaultLanguage = "en";
 
@@ -43,10 +46,31 @@ const getKey = (allMessages: Messages, locale: string, key: string): MFunc | str
 	return "";
 }
 
-export const makeT = (): TFunc => {
+const makeIntlFormatters = (locale: () => string): IntlFormatters => {
+	if (typeof Intl === "undefined") {
+		const error = () => {
+			throw new Error("Missing Intl");
+		};
+		return { date: error, number: error };
+	}
+
 	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
 	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(Intl.NumberFormat);
 
+	const date = (value: Date | number, style: keyof typeof dateTimeFormats = "long", dateLocale = locale()) => {
+		const format = dateTimeFormats[style] || dateTimeFormats.long;
+		return dateFormatter(dateLocale, format).format(value);
+	}
+
+	const number = (value: number, style: keyof typeof numberFormats = "decimal", numberLocale = locale()) => {
+		const format = numberFormats[style] || numberFormats.decimal;
+		return numberFormatter(numberLocale, format).format(value);
+	}
+
+	return { date, number };
+}
+
+export const makeBasicT = (): BasicTFunc => {
 	let messages: Messages = {};
 	let locale = defaultLanguage;
 	let idGenerator = generator.hyphens;
@@ -57,16 +81,6 @@ export const makeT = (): TFunc => {
 		idGenerator = options.idGenerator || idGenerator;
 
 		return { messages, locale, idGenerator };
-	}
-
-	const date = (value: Date | number, style: keyof typeof dateTimeFormats = "long", dateLocale = locale) => {
-		const format = dateTimeFormats[style] || dateTimeFormats.long;
-		return dateFormatter(dateLocale, format).format(value);
-	}
-
-	const number = (value: number, style: keyof typeof numberFormats = "decimal", numberLocale = locale) => {
-		const format = numberFormats[style] || numberFormats.decimal;
-		return numberFormatter(numberLocale, format).format(value);
 	}
 
 	const generateId = (message: string) => idGenerator(message);
@@ -92,15 +106,19 @@ export const makeT = (): TFunc => {
 
 	const properties = {
 		$,
-		date,
 		generateId,
 		locale: () => locale,
 		lookup,
-		number,
 		set,
 	};
 
 	return assign(T, properties);
+}
+
+export const makeT = (): TFunc => {
+	const T = makeBasicT();
+	const formatters = makeIntlFormatters(T.locale);
+	return assign(T, formatters);
 }
 
 // singleton (T)
