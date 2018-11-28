@@ -54,6 +54,33 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 		return { date: error, number: error };
 	}
 
+	// HACK: See https://bugs.chromium.org/p/chromium/issues/detail?id=811403
+	const getDateTimeFormat = () => {
+		const delegate = Intl.DateTimeFormat;
+		function DateTimeFormat(this: any) {
+			const args = Array.prototype.slice.apply(arguments);
+			args[0] = args[0] || "en-US";
+			args[1] = args[1] || {};
+			args[1].timeZone = args[1].timeZone || "America/Toronto";
+			return delegate.apply(this, args);
+		}
+		DateTimeFormat.prototype = delegate.prototype;
+		return DateTimeFormat;
+	}
+
+	try {
+		Intl.DateTimeFormat();
+		(new Date()).toLocaleString();
+		(new Date()).toLocaleDateString();
+		(new Date()).toLocaleTimeString();
+	} catch (err) {
+		Date.prototype.toLocaleString = Date.prototype.toString;
+		Date.prototype.toLocaleDateString = Date.prototype.toDateString;
+		Date.prototype.toLocaleTimeString = Date.prototype.toTimeString;
+		Intl.DateTimeFormat = getDateTimeFormat() as any;
+	}
+	// HACK: end
+
 	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
 	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(Intl.NumberFormat);
 
