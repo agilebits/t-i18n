@@ -54,6 +54,19 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 		return { date: error, number: error };
 	}
 
+    Date.prototype.toLocaleString = Date.prototype.toString;
+    Date.prototype.toLocaleTimeString = Date.prototype.toTimeString;
+    const delegate = Intl.DateTimeFormat;
+    function DateTimeFormat(): typeof Intl.DateTimeFormat {
+      const args = Array.prototype.slice.apply(arguments);
+      args[0] = args[0] || "en-US";
+      args[1] = args[1] || {};
+	  args[1].timeZone = args[1].timeZone || "America/Toronto";
+      return delegate.apply(this, args);
+    }
+	DateTimeFormat.prototype = delegate.prototype;
+    Intl.DateTimeFormat = DateTimeFormat;
+
 	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
 	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(Intl.NumberFormat);
 
