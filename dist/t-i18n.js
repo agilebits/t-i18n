@@ -23,6 +23,30 @@ var makeIntlFormatters = function (locale) {
         };
         return { date: error, number: error };
     }
+    var getDateTimeFormat = function () {
+        var delegate = Intl.DateTimeFormat;
+        function DateTimeFormat() {
+            var args = Array.prototype.slice.apply(arguments);
+            args[0] = args[0] || "en-US";
+            args[1] = args[1] || {};
+            args[1].timeZone = args[1].timeZone || "America/Toronto";
+            return delegate.apply(this, args);
+        }
+        DateTimeFormat.prototype = delegate.prototype;
+        return DateTimeFormat;
+    };
+    try {
+        Intl.DateTimeFormat();
+        (new Date()).toLocaleString();
+        (new Date()).toLocaleDateString();
+        (new Date()).toLocaleTimeString();
+    }
+    catch (err) {
+        Date.prototype.toLocaleString = Date.prototype.toString;
+        Date.prototype.toLocaleDateString = Date.prototype.toDateString;
+        Date.prototype.toLocaleTimeString = Date.prototype.toTimeString;
+        Intl.DateTimeFormat = getDateTimeFormat();
+    }
     var dateFormatter = format_1.default(Intl.DateTimeFormat);
     var numberFormatter = format_1.default(Intl.NumberFormat);
     var date = function (value, style, dateLocale) {

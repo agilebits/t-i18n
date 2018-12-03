@@ -21,6 +21,30 @@ const makeIntlFormatters = (locale) => {
         };
         return { date: error, number: error };
     }
+    const getDateTimeFormat = () => {
+        const delegate = Intl.DateTimeFormat;
+        function DateTimeFormat() {
+            const args = Array.prototype.slice.apply(arguments);
+            args[0] = args[0] || "en-US";
+            args[1] = args[1] || {};
+            args[1].timeZone = args[1].timeZone || "America/Toronto";
+            return delegate.apply(this, args);
+        }
+        DateTimeFormat.prototype = delegate.prototype;
+        return DateTimeFormat;
+    };
+    try {
+        Intl.DateTimeFormat();
+        (new Date()).toLocaleString();
+        (new Date()).toLocaleDateString();
+        (new Date()).toLocaleTimeString();
+    }
+    catch (err) {
+        Date.prototype.toLocaleString = Date.prototype.toString;
+        Date.prototype.toLocaleDateString = Date.prototype.toDateString;
+        Date.prototype.toLocaleTimeString = Date.prototype.toTimeString;
+        Intl.DateTimeFormat = getDateTimeFormat();
+    }
     const dateFormatter = createCachedFormatter(Intl.DateTimeFormat);
     const numberFormatter = createCachedFormatter(Intl.NumberFormat);
     const date = (value, style = "long", dateLocale = locale()) => {
