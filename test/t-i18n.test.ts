@@ -348,3 +348,47 @@ describe("T.number", () => {
         expect(result).to.equal(expected);
     });
 });
+
+describe("T.t", () => {
+    const T = makeT();
+
+    const messages = {
+        en: {
+            "Hi--r0--": "Hi {r0}!",
+        },
+        es: {
+            "Hi--r0--": "Hola {r0}!",
+        }
+    }
+    T.set({
+        locale: "es",
+        messages: messages,
+        idGenerator: generator.hyphens
+    });
+
+    it("should render a template string w/replacement", () => {
+        const expected = "Hola Rob!";
+        const name = "Rob";
+        const result = T.t`Hi ${name}!`;
+        expect(result).to.equal(expected);
+    });
+
+    it("should render a template string w/replacement in the default language if no translation is found", () => {
+        const expected = "Hey Rob!";
+        const name = "Rob";
+        const result = T.t`Hey ${name}!`;
+        expect(result).to.equal(expected);
+    });
+
+    it("should render a template string w/replacement with context", () => {
+        const expected = "Hola Rob!";
+        const name = {
+            context: "first name",
+            value: "Rob"
+        };
+        const result = T.t`Hi ${name}!`;
+        expect(result).to.equal(expected);
+    });
+});
+
+

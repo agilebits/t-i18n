@@ -1,4 +1,4 @@
-import { IcuReplacements, Messages, MFunc, Config, AnyReplacements } from "./types";
+import { IcuReplacements, Messages, MFunc, Config, AnyReplacements, TemplateReplacement } from "./types";
 import createCachedFormatter, { numberFormats, dateTimeFormats} from "./format";
 import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
@@ -18,6 +18,7 @@ import parseXml from "./xml";
 export interface BasicTFunc {
 	(message: string, replacements?: IcuReplacements, id?: string): string;
 	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
+	t: (message: TemplateStringsArray, ...replacements: TemplateReplacement[]) => string;
 	generateId: (message: string) => string;
 	locale: () => string;
 	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
@@ -131,8 +132,20 @@ export const makeBasicT = (): BasicTFunc => {
 		return parseXml(translatedMessage, xml);
 	}
 
+	const t = (message: TemplateStringsArray, ...replacements: TemplateReplacement[]) => {
+		const rawString = message.map((m, i) => i === message.length - 1 ? m : `${m}${replacements[i]}`).join("");
+		const icuString = message.map((m, i) => i === message.length - 1 ? m : `${m}{r${i}}`).join("");
+		const replacementsMap: IcuReplacements = replacements.reduce((map, r, i) => (
+			{...map, ...{
+				[`r${i}`]: typeof r === "object" ? r.value : r
+			}}
+		), {});
+		return lookup(generateId(icuString), replacementsMap, rawString)
+	}
+
 	const properties = {
 		$,
+		t,
 		generateId,
 		locale: () => locale,
 		lookup,

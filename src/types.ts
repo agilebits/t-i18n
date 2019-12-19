@@ -45,3 +45,9 @@ export interface XmlReplacements<X> {
 export interface AnyReplacements<X> {
 	readonly [s: string]: string | number | ((...children: (X | string)[]) => X);
 }
+
+export type SimpleTemplateReplacement = string | number;
+export type TemplateReplacement = SimpleTemplateReplacement | {
+	value: SimpleTemplateReplacement;
+	context: string;
+}
