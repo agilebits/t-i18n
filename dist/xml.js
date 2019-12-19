@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var XML_WRAPPER = "wrap";
 var parser;
@@ -22,7 +29,7 @@ function walk(node, replacements, isRoot) {
     }
     else if (node.nodeType === NODE_TYPE_ELEMENT) {
         var children = Array.prototype.slice.call(node.childNodes);
-        var replacedChildren = children.reduce(function (acc, child) { return acc.concat(walk(child, replacements)); }, []);
+        var replacedChildren = children.reduce(function (acc, child) { return __spreadArrays(acc, walk(child, replacements)); }, []);
         return (isRoot || !replacements[node.nodeName]
             ? replacedChildren
             : [replacements[node.nodeName].apply(replacements, replacedChildren)]);
