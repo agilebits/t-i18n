@@ -58,11 +58,10 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 	const getDateTimeFormat = () => {
 		const delegate = Intl.DateTimeFormat;
 		function DateTimeFormat(this: any) {
-			const args = Array.prototype.slice.apply(arguments);
-			args[0] = args[0] || "en-US";
-			args[1] = args[1] || {};
-			args[1].timeZone = args[1].timeZone || "America/Toronto";
-			return delegate.apply(this, args as [string, Intl.DateTimeFormatOptions]);
+			const args= Array.prototype.slice.apply(arguments);
+			const lang = typeof args?.[0] === "string" ? args[0] : "en-US";
+			const timeZone = typeof args?.[1]?.timeZone === "string" ? args[1].timeZone : "America/Toronto";
+			return delegate.apply(this, [lang, timeZone]);
 		}
 		DateTimeFormat.prototype = delegate.prototype;
 		return DateTimeFormat;
