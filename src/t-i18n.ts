@@ -62,7 +62,7 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 			args[0] = args[0] || "en-US";
 			args[1] = args[1] || {};
 			args[1].timeZone = args[1].timeZone || "America/Toronto";
-			return delegate.apply(this, args);
+			return delegate.apply(this, args as [string, Intl.DateTimeFormatOptions]);
 		}
 		DateTimeFormat.prototype = delegate.prototype;
 		return DateTimeFormat;
