@@ -29,14 +29,14 @@
     "icu"
   ],
   "devDependencies": {
-    "@types/chai": "^4.0.4",
-    "@types/mocha": "^2.2.48",
-    "@types/node": "^8.0.24",
-    "chai": "^4.1.1",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.21",
+    "chai": "^4.2.0",
     "glob": "^7.1.2",
-    "mocha": "^5.1.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.8.1",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3",
     "xmldom": "^0.1.27"
   },
   "dependencies": {

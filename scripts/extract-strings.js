@@ -74,7 +74,7 @@ function runner(err, files) {
     const messages = files.map(file => new Promise(resolve => fs.readFile(file, 'utf8', (err, contents) => resolve(extractMessages(contents)))));
     Promise.all(messages).then(values => {
         const allMessages = values.reduce((all, current) => {
-            return Object.assign({}, all, current);
+            return Object.assign(Object.assign({}, all), current);
         }, messages[0]);
         output(sort(allMessages), outPath);
     });
