@@ -40,6 +40,6 @@
     "xmldom": "^0.1.27"
   },
   "dependencies": {
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.5"
   }
 }
