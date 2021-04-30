@@ -24,11 +24,11 @@ const makeIntlFormatters = (locale) => {
     const getDateTimeFormat = () => {
         const delegate = Intl.DateTimeFormat;
         function DateTimeFormat() {
+            var _a, _b, _c;
             const args = Array.prototype.slice.apply(arguments);
-            args[0] = args[0] || "en-US";
-            args[1] = args[1] || {};
-            args[1].timeZone = args[1].timeZone || "America/Toronto";
-            return delegate.apply(this, args);
+            const lang = typeof ((_a = args) === null || _a === void 0 ? void 0 : _a[0]) === "string" ? args[0] : "en-US";
+            const timeZone = typeof ((_c = (_b = args) === null || _b === void 0 ? void 0 : _b[1]) === null || _c === void 0 ? void 0 : _c.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
+            return delegate.apply(this, [lang, timeZone]);
         }
         DateTimeFormat.prototype = delegate.prototype;
         return DateTimeFormat;
