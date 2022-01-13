@@ -36,7 +36,8 @@ const runBasicTTests = (T: BasicTFunc) => {
             "Goodbye--world": () => "Goodbye, world",
             "some-id": () => "Some message",
             "greet": () => "Hi, {name}",
-            "greet-precompiled": (d: any) => "Hi, " + d.name
+            "greet-precompiled": (d: any) => "Hi, " + d.name,
+            "Your--daysLeftInTrial--day-trial-starts-today": "Your {daysLeftInTrial} day trial starts today",
         },
         es: {
             "Hello--world": () => "Hola, mundo",
@@ -44,6 +45,8 @@ const runBasicTTests = (T: BasicTFunc) => {
             "greet": () => "Hola, {name}",
             "greet-precompiled": (d: any) => "Hola, " + d.name,
             "not-compiled": "No compilado",
+            // Actually French, but caused us an issue
+            "Your--daysLeftInTrial--day-trial-starts-today": "Votre essai d'{daysLeftInTrial} jour commence aujourd'hui",
         }
     }
     T.set({
@@ -85,6 +88,12 @@ const runBasicTTests = (T: BasicTFunc) => {
     it("should compile a string message with replacements", () => {
         const expected = "Howdy, Mitch";
         const result = T("Howdy, {name}", {name: "Mitch"});
+        expect(result).to.equal(expected);
+    });
+
+    it("should compile this specific French string", () => {
+        const expected = "Votre essai d'10 jour commence aujourd'hui";
+        const result = T("Your {daysLeftInTrial} day trial starts today", {daysLeftInTrial: 10});
         expect(result).to.equal(expected);
     });
 }
