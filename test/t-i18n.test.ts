@@ -6,7 +6,7 @@ import { dateTimeFormats, numberFormats } from "../src/format";
 import { BasicTFunc, TFunc } from "../src/t-i18n";
 
 // Shim for DOM XML parser
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 global["DOMParser"] = DOMParser;
 global["Node"] = {
     ELEMENT_NODE: 1
