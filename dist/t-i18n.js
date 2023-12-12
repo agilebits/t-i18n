@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeT = exports.makeBasicT = void 0;
 var format_1 = require("./format");
 var helpers_1 = require("./helpers");
 var icu_1 = require("./icu");
@@ -26,10 +27,10 @@ var makeIntlFormatters = function (locale) {
     var getDateTimeFormat = function () {
         var delegate = Intl.DateTimeFormat;
         function DateTimeFormat() {
-            var _a, _b, _c;
+            var _a;
             var args = Array.prototype.slice.apply(arguments);
-            var lang = typeof ((_a = args) === null || _a === void 0 ? void 0 : _a[0]) === "string" ? args[0] : "en-US";
-            var timeZone = typeof ((_c = (_b = args) === null || _b === void 0 ? void 0 : _b[1]) === null || _c === void 0 ? void 0 : _c.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
+            var lang = typeof (args === null || args === void 0 ? void 0 : args[0]) === "string" ? args[0] : "en-US";
+            var timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
             return delegate.apply(this, [lang, timeZone]);
         }
         DateTimeFormat.prototype = delegate.prototype;
@@ -47,8 +48,8 @@ var makeIntlFormatters = function (locale) {
         Date.prototype.toLocaleTimeString = Date.prototype.toTimeString;
         Intl.DateTimeFormat = getDateTimeFormat();
     }
-    var dateFormatter = format_1.default(Intl.DateTimeFormat);
-    var numberFormatter = format_1.default(Intl.NumberFormat);
+    var dateFormatter = (0, format_1.default)(Intl.DateTimeFormat);
+    var numberFormatter = (0, format_1.default)(Intl.NumberFormat);
     var date = function (value, style, dateLocale) {
         if (style === void 0) { style = "long"; }
         if (dateLocale === void 0) { dateLocale = locale(); }
@@ -63,7 +64,7 @@ var makeIntlFormatters = function (locale) {
     };
     return { date: date, number: number };
 };
-exports.makeBasicT = function () {
+var makeBasicT = function () {
     var messages = {};
     var locale = defaultLanguage;
     var idGenerator = helpers_1.generator.hyphens;
@@ -80,7 +81,7 @@ exports.makeBasicT = function () {
         if (defaultMessage === void 0) { defaultMessage = ""; }
         var translation = getKey(messages, locale, id) || defaultMessage || id;
         if (typeof translation === "string") {
-            return icu_1.default(translation, replacements);
+            return (0, icu_1.default)(translation, replacements);
         }
         return translation(replacements);
     };
@@ -92,9 +93,9 @@ exports.makeBasicT = function () {
     var $ = function (message, replacements, id) {
         if (replacements === void 0) { replacements = {}; }
         if (id === void 0) { id = ""; }
-        var _a = helpers_1.splitAndEscapeReplacements(replacements), icu = _a[0], xml = _a[1];
+        var _a = (0, helpers_1.splitAndEscapeReplacements)(replacements), icu = _a[0], xml = _a[1];
         var translatedMessage = T(message, icu, id);
-        return xml_1.default(translatedMessage, xml);
+        return (0, xml_1.default)(translatedMessage, xml);
     };
     var properties = {
         $: $,
@@ -103,11 +104,13 @@ exports.makeBasicT = function () {
         lookup: lookup,
         set: set,
     };
-    return helpers_1.assign(T, properties);
+    return (0, helpers_1.assign)(T, properties);
 };
-exports.makeT = function () {
-    var T = exports.makeBasicT();
+exports.makeBasicT = makeBasicT;
+var makeT = function () {
+    var T = (0, exports.makeBasicT)();
     var formatters = makeIntlFormatters(T.locale);
-    return helpers_1.assign(T, formatters);
+    return (0, helpers_1.assign)(T, formatters);
 };
-exports.default = exports.makeT();
+exports.makeT = makeT;
+exports.default = (0, exports.makeT)();

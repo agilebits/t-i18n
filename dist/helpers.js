@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.assign = exports.splitAndEscapeReplacements = exports.generator = void 0;
+exports.Plural = Plural;
 var spaceRegex = /\s/g;
 var nonWordRegex = /\W/g;
 exports.generator = {
@@ -18,7 +20,6 @@ function Plural(pluralizeFor, options) {
         (one ? "\tone{" + one + "}\n" : "") +
         ("\tother{" + other + "}}");
 }
-exports.Plural = Plural;
 var xmlEscapes = {
     "&": "&amp;",
     "<": "&lt;",
@@ -27,7 +28,7 @@ var xmlEscapes = {
     "'": '&#39;'
 };
 var escapeXml = function (str) { return (str.replace(/[&<>"']/g, function (match) { return xmlEscapes[match]; })); };
-exports.splitAndEscapeReplacements = function (replacements) {
+var splitAndEscapeReplacements = function (replacements) {
     var icu = {};
     var xml = {};
     for (var key in replacements) {
@@ -46,7 +47,8 @@ exports.splitAndEscapeReplacements = function (replacements) {
     }
     return [icu, xml];
 };
-exports.assign = function (target, source) {
+exports.splitAndEscapeReplacements = splitAndEscapeReplacements;
+var assign = function (target, source) {
     var to = Object(target);
     for (var nextKey in source) {
         if (Object.prototype.hasOwnProperty.call(source, nextKey)) {
@@ -55,3 +57,4 @@ exports.assign = function (target, source) {
     }
     return to;
 };
+exports.assign = assign;

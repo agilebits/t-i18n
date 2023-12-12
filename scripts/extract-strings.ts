@@ -2,7 +2,7 @@
 
 import * as ts from "typescript";
 import * as fs from "fs";
-import * as glob from "glob";
+import { globSync } from "glob";
 import * as minimist from "minimist";
 import {T, Plural, generator} from "../dist/index"
 
@@ -84,7 +84,7 @@ function extractMessages(contents: string) {
     return messages;
 }
 
-function runner(err: any, files:string[]) {
+function runner(files: string[]) {
     console.log(`Extracting strings from '${files[0]}' + ${files.length -1} other files...`);
     const messages = files.map(file =>
         new Promise(resolve =>
@@ -122,4 +122,5 @@ function output(messages: any, outPath: string) {
 const args = minimist(process.argv.slice(2));
 const input = args._[0] || process.cwd() + "/**/*.ts";
 const outPath = args.outfile || null;
-glob(input, {absolute: true}, runner);
+const files = globSync(input, {absolute: true});
+runner(files);

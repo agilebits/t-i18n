@@ -24,10 +24,10 @@ const makeIntlFormatters = (locale) => {
     const getDateTimeFormat = () => {
         const delegate = Intl.DateTimeFormat;
         function DateTimeFormat() {
-            var _a, _b, _c;
+            var _a;
             const args = Array.prototype.slice.apply(arguments);
-            const lang = typeof ((_a = args) === null || _a === void 0 ? void 0 : _a[0]) === "string" ? args[0] : "en-US";
-            const timeZone = typeof ((_c = (_b = args) === null || _b === void 0 ? void 0 : _b[1]) === null || _c === void 0 ? void 0 : _c.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
+            const lang = typeof (args === null || args === void 0 ? void 0 : args[0]) === "string" ? args[0] : "en-US";
+            const timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
             return delegate.apply(this, [lang, timeZone]);
         }
         DateTimeFormat.prototype = delegate.prototype;

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts = require("typescript");
 const fs = require("fs");
-const glob = require("glob");
+const glob_1 = require("glob");
 const minimist = require("minimist");
 const index_1 = require("../dist/index");
 const helpers = {
@@ -69,7 +69,7 @@ function extractMessages(contents) {
     });
     return messages;
 }
-function runner(err, files) {
+function runner(files) {
     console.log(`Extracting strings from '${files[0]}' + ${files.length - 1} other files...`);
     const messages = files.map(file => new Promise(resolve => fs.readFile(file, 'utf8', (err, contents) => resolve(extractMessages(contents)))));
     Promise.all(messages).then(values => {
@@ -98,4 +98,5 @@ function output(messages, outPath) {
 const args = minimist(process.argv.slice(2));
 const input = args._[0] || process.cwd() + "/**/*.ts";
 const outPath = args.outfile || null;
-glob(input, { absolute: true }, runner);
+const files = (0, glob_1.globSync)(input, { absolute: true });
+runner(files);

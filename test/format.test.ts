@@ -5,7 +5,7 @@ import createCachedFormatter from "../src/format";
 
 describe("createCachedFormatter", () => {
     it("should create a date formatter", () => {
-        const options =  {day: "numeric", month: "long", year: "numeric"};
+        const options = {day: "numeric", month: "long", year: "numeric"} as const;
         const date = new Date(2017, 8, 1);
         const formatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
 

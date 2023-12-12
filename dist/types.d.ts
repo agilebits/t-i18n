@@ -1,5 +1,5 @@
-export declare type MFunc = (replacements?: IcuReplacements) => string;
-export declare type Compiler = (message: string) => MFunc;
+export type MFunc = (replacements?: IcuReplacements) => string;
+export type Compiler = (message: string) => MFunc;
 export interface Messages {
     [s: string]: {
         [s: string]: string | MFunc;
@@ -10,8 +10,8 @@ export interface Config {
     locale: string;
     idGenerator: (message: string) => string;
 }
-export declare type Mutable<X> = {
-    [P in keyof X]: X[P];
+export type Mutable<X> = {
+    -readonly [P in keyof X]: X[P];
 };
 export interface IcuReplacements {
     readonly [s: string]: string | number;

@@ -12,7 +12,7 @@ export interface IntlFormatters {
     date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
     number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
 }
-export declare type TFunc = BasicTFunc & IntlFormatters;
+export type TFunc = BasicTFunc & IntlFormatters;
 export declare const makeBasicT: () => BasicTFunc;
 export declare const makeT: () => TFunc;
 declare const _default: TFunc;

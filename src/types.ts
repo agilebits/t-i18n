@@ -29,8 +29,8 @@ export interface Config {
 }
 
 export type Mutable<X> = {
-	[P in keyof X]: X[P];
-}
+	-readonly [P in keyof X]: X[P];
+};
 
 // { name: "Mitch", age: 10 }
 export interface IcuReplacements {

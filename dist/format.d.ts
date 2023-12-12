@@ -1,36 +1,36 @@
-export declare type IntlFormat = Intl.DateTimeFormat | Intl.NumberFormat;
-export declare type IntlFormatType<X extends IntlFormat> = X extends Intl.DateTimeFormat ? typeof Intl.DateTimeFormat : typeof Intl.NumberFormat;
-export declare type IntlFormatOptions<X extends IntlFormat> = X extends Intl.DateTimeFormat ? Intl.DateTimeFormatOptions : Intl.NumberFormatOptions;
-export declare type CachedFormatter<X extends IntlFormat> = (locale: string, formatOptions?: IntlFormatOptions<X>) => X;
+export type IntlFormat = Intl.DateTimeFormat | Intl.NumberFormat;
+export type IntlFormatType<X extends IntlFormat> = X extends Intl.DateTimeFormat ? typeof Intl.DateTimeFormat : typeof Intl.NumberFormat;
+export type IntlFormatOptions<X extends IntlFormat> = X extends Intl.DateTimeFormat ? Intl.DateTimeFormatOptions : Intl.NumberFormatOptions;
+export type CachedFormatter<X extends IntlFormat> = (locale: string, formatOptions?: IntlFormatOptions<X>) => X;
 export declare const dateTimeFormats: {
-    short: {
-        month: string;
-        day: string;
-        year: string;
+    readonly short: {
+        readonly month: "short";
+        readonly day: "numeric";
+        readonly year: "numeric";
     };
-    long: {
-        month: string;
-        day: string;
-        year: string;
+    readonly long: {
+        readonly month: "long";
+        readonly day: "numeric";
+        readonly year: "numeric";
     };
-    dateTime: {
-        month: string;
-        day: string;
-        year: string;
-        hour: string;
-        minute: string;
+    readonly dateTime: {
+        readonly month: "short";
+        readonly day: "numeric";
+        readonly year: "numeric";
+        readonly hour: "numeric";
+        readonly minute: "numeric";
     };
 };
 export declare const numberFormats: {
-    currency: {
-        style: string;
-        currency: string;
+    readonly currency: {
+        readonly style: "currency";
+        readonly currency: "USD";
     };
-    decimal: {
-        style: string;
+    readonly decimal: {
+        readonly style: "decimal";
     };
-    percent: {
-        style: string;
+    readonly percent: {
+        readonly style: "percent";
     };
 };
 export default function createCachedFormatter<X extends IntlFormat>(intlFormat: IntlFormatType<X>): CachedFormatter<X>;

@@ -22,7 +22,7 @@ export const dateTimeFormats = {
 		hour: "numeric",
 		minute: "numeric"
 	}
-};
+} as const;
 
 export const numberFormats = {
 	currency: {
@@ -35,7 +35,7 @@ export const numberFormats = {
 	percent: {
 		style: "percent"
 	}
-}
+} as const;
 
 // Create cached versions of Intl.DateTimeFormat and Intl.NumberFormat
 export default function createCachedFormatter<X extends IntlFormat>(intlFormat: IntlFormatType<X>): CachedFormatter<X> {

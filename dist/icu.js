@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = parseIcu;
 var TOKEN = {
     OPEN: '{',
     CLOSE: '}',
@@ -26,4 +27,3 @@ function parseIcu(icuString, replacements) {
     elements.push(currentToken);
     return elements.join('');
 }
-exports.default = parseIcu;

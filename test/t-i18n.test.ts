@@ -7,10 +7,7 @@ import { BasicTFunc, TFunc } from "../src/t-i18n";
 
 // Shim for DOM XML parser
 import { DOMParser } from "@xmldom/xmldom";
-global["DOMParser"] = DOMParser;
-global["Node"] = {
-    ELEMENT_NODE: 1
-};
+globalThis.DOMParser = DOMParser;
 
 describe("Plural", () => {
     const expected = "{numMinutes, plural,\n" +
@@ -72,7 +69,7 @@ const runBasicTTests = (T: BasicTFunc) => {
 
     it("should use provided ID to look up translation", () => {
         const expected = "Algún mensaje";
-        const result = T("Some message", null, "some-id");
+        const result = T("Some message", undefined, "some-id");
         expect(result).to.equal(expected);
     });
 
@@ -188,7 +185,7 @@ describe("T.$", () => {
 
     it("should replace a self-closing tag", () => {
         const expected = ["A ", { text: "B" }];
-        const result = T.$(
+        const result = T.$<{ text: string }>(
             "{a} <b />",
             {
                 a: "A",
@@ -313,7 +310,7 @@ describe("T.date", () => {
     it("should print a date in the provided locale", () => {
         const date = Date.now();
         const expected = new Intl.DateTimeFormat("ru", dateTimeFormats.long).format(date);
-        const result = T.date(date, null, "ru");
+        const result = T.date(date, undefined, "ru");
         expect(result).to.equal(expected);
     });
 });
@@ -344,7 +341,7 @@ describe("T.number", () => {
     it("should print a number in the provided locale", () => {
         const number = 25;
         const expected = new Intl.NumberFormat("ko", numberFormats.decimal).format(number);
-        const result = T.number(number, null, "ko");
+        const result = T.number(number, undefined, "ko");
         expect(result).to.equal(expected);
     });
 });
