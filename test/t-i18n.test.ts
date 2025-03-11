@@ -1,7 +1,15 @@
 /// <reference path="../node_modules/@types/mocha/index.d.ts" />
 
 import { expect } from "chai";
-import { makeBasicT, makeT, Plural, generator, T as globalT } from "../src";
+import {
+	makeBasicT,
+	makeErrorBasicT,
+	makeErrorT,
+	makeT,
+	Plural,
+	generator,
+	T as globalT,
+} from "../src";
 import { dateTimeFormats, numberFormats } from "../src/format";
 import { BasicTFunc, TFunc } from "../src/t-i18n";
 
@@ -323,5 +331,35 @@ describe("T.number", () => {
 		);
 		const result = T.number(number, undefined, "ko");
 		expect(result).to.equal(expected);
+	});
+});
+
+describe("makeErrorBasicT", () => {
+	it("should produce a T that errors on every function call", () => {
+		const message = "LocaleProvider is not mounted";
+		const T = makeErrorBasicT(message);
+
+		expect(() => T("test")).to.throw(message);
+		expect(() => T.$("test")).to.throw(message);
+		expect(() => T.generateId("test")).to.throw(message);
+		expect(() => T.locale()).to.throw(message);
+		expect(() => T.lookup("abc")).to.throw(message);
+		expect(() => T.set({ locale: "en" })).to.throw(message);
+	});
+});
+
+describe("makeErrorT", () => {
+	it("should produce a T that errors on every function call", () => {
+		const message = "LocaleProvider is not mounted";
+		const T = makeErrorT(message);
+
+		expect(() => T("test")).to.throw(message);
+		expect(() => T.$("test")).to.throw(message);
+		expect(() => T.generateId("test")).to.throw(message);
+		expect(() => T.locale()).to.throw(message);
+		expect(() => T.lookup("abc")).to.throw(message);
+		expect(() => T.set({ locale: "en" })).to.throw(message);
+		expect(() => T.date(new Date())).to.throw(message);
+		expect(() => T.number(12345)).to.throw(message);
 	});
 });
