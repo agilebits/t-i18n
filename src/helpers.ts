@@ -1,4 +1,9 @@
-import { AnyReplacements, IcuReplacements, Mutable, XmlReplacements } from "./types";
+import {
+	AnyReplacements,
+	IcuReplacements,
+	Mutable,
+	XmlReplacements,
+} from "./types";
 
 export interface PluralOptions {
 	other: string;
@@ -13,33 +18,41 @@ export const generator = {
 	plain(message: string): string {
 		return message;
 	},
-	hyphens(message: string):string {
-		const hyphenated = message.trim().replace(spaceRegex, "-").replace(nonWordRegex, '-');
+	hyphens(message: string): string {
+		const hyphenated = message
+			.trim()
+			.replace(spaceRegex, "-")
+			.replace(nonWordRegex, "-");
 		return hyphenated;
-	}
-}
+	},
+};
 
 export function Plural(pluralizeFor: string, options: PluralOptions): string {
-	const {zero, one, other} = options;
-	return "{" + pluralizeFor + ", plural,\n" +
-			(zero ? "\t=0{" + zero + "}\n" : "") +
-			(one ? "\tone{" + one + "}\n" : "") +
-			("\tother{" + other + "}}");
+	const { zero, one, other } = options;
+	return (
+		"{" +
+		pluralizeFor +
+		", plural,\n" +
+		(zero ? "\t=0{" + zero + "}\n" : "") +
+		(one ? "\tone{" + one + "}\n" : "") +
+		("\tother{" + other + "}}")
+	);
 }
 
 const xmlEscapes: { [key: string]: string } = {
 	"&": "&amp;",
 	"<": "&lt;",
 	">": "&gt;",
-	"\"": "&quot;",
-	"'": '&#39;'
+	'"': "&quot;",
+	"'": "&#39;",
 };
 
-const escapeXml = (str: string) => (
-	str.replace(/[&<>"']/g, (match) => xmlEscapes[match])
-);
+const escapeXml = (str: string) =>
+	str.replace(/[&<>"']/g, (match) => xmlEscapes[match]);
 
-export const splitAndEscapeReplacements = <X>(replacements: AnyReplacements<X>): [IcuReplacements, XmlReplacements<X>] => {
+export const splitAndEscapeReplacements = <X>(
+	replacements: AnyReplacements<X>,
+): [IcuReplacements, XmlReplacements<X>] => {
 	const icu: Mutable<IcuReplacements> = {};
 	const xml: Mutable<XmlReplacements<X>> = {};
 	for (const key in replacements) {
@@ -55,7 +68,7 @@ export const splitAndEscapeReplacements = <X>(replacements: AnyReplacements<X>):
 		}
 	}
 	return [icu, xml];
-}
+};
 
 // Based on the Object.assign polyfill at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 export const assign = <T, U>(target: T, source: U): T & U => {
