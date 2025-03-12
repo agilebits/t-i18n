@@ -1,45 +1,51 @@
 {
-  "name": "t-i18n",
-  "version": "0.6.5",
-  "description": "Simple, standards-based localization",
-  "author": "Mitch Cohen <mitch.cohen@me.com>",
-  "homepage": "https://github.com/agilebits/t-i18n#readme",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:agilebits/t-i18n.git"
-  },
-  "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/es6/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "clean": "cd dist/; rm -rf *",
-    "build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
-    "prepublishOnly": "npm run build",
-    "test": "mocha -r ts-node/register ./test/*.test.ts"
-  },
-  "bin": {
-    "extract-strings": "./scripts/extract-strings.js"
-  },
-  "keywords": [
-    "i18n",
-    "l10n",
-    "globalization",
-    "translation",
-    "icu"
-  ],
-  "devDependencies": {
-    "@types/chai": "^4.2.7",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^12.12.21",
-    "chai": "^4.2.0",
-    "glob": "^7.1.2",
-    "mocha": "^10.2.0",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.3",
-    "@xmldom/xmldom": "^0.8.10"
-  },
-  "dependencies": {
-    "minimist": "^1.2.5"
-  }
+	"name": "t-i18n",
+	"version": "0.6.5",
+	"description": "Simple, standards-based localization",
+	"author": "Mitch Cohen <mitch.cohen@me.com>",
+	"homepage": "https://github.com/agilebits/t-i18n#readme",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:agilebits/t-i18n.git"
+	},
+	"license": "MIT",
+	"main": "dist/index.js",
+	"module": "dist/es6/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"clean": "cd dist/; rm -rf *",
+		"build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
+		"prepublishOnly": "npm run build",
+		"prettier": "prettier . --write",
+		"prettier-check": "prettier . --check",
+		"test": "mocha -r ts-node/register ./test/*.test.ts"
+	},
+	"prettier": {
+		"useTabs": true
+	},
+	"bin": {
+		"extract-strings": "./scripts/extract-strings.js"
+	},
+	"keywords": [
+		"i18n",
+		"l10n",
+		"globalization",
+		"translation",
+		"icu"
+	],
+	"devDependencies": {
+		"@types/chai": "^4.2.7",
+		"@types/mocha": "^10.0.10",
+		"@types/node": "^22.13.10",
+		"@xmldom/xmldom": "^0.8.10",
+		"chai": "^4.2.0",
+		"glob": "^11.0.1",
+		"mocha": "^11.1.0",
+		"prettier": "^3.5.3",
+		"ts-node": "^10.9.2",
+		"typescript": "5.5"
+	},
+	"dependencies": {
+		"minimist": "^1.2.8"
+	}
 }

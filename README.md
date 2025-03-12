@@ -8,9 +8,9 @@ Just wrap your user-facing strings in `T`. Don't worry about IDs.
 
 ```js
 // Import T as a singleton
-import {T} from "t-i18n"
+import { T } from "t-i18n";
 
-T("Hello world")
+T("Hello world");
 ```
 
 Extract the strings from your code:
@@ -30,12 +30,12 @@ Then load the translations, pass them to `T` and set the locale.
 
 ```js
 T.set({
-    locale: "es",
-    messages: {
-        en: englishJSON,
-        es: spanishJSON
-    }
-})
+	locale: "es",
+	messages: {
+		en: englishJSON,
+		es: spanishJSON,
+	},
+});
 ```
 
 And that's it. You're localized.
@@ -46,10 +46,10 @@ Formatting is provided courtesy of the [Intl](https://developer.mozilla.org/en-U
 
 ```js
 // Get a localized, formatted date
-T.date(Date.now(), "short")
+T.date(Date.now(), "short");
 
 // Or a number
-T.number(5, "currency")
+T.number(5, "currency");
 ```
 
 Formatters cache themselves automatically, so you don't have to.
@@ -60,20 +60,17 @@ Basic values are easy to replace.
 
 ```js
 // "First name: Wendy"
-T("First name: {userName}", { userName: "Wendy"})
+T("First name: {userName}", { userName: "Wendy" });
 ```
 
 Non-string values (like React components) can be interpolated using an XML syntax.
 
 ```jsx
 // ["There's a ", <button>button</button>, " in my sentence!"]
-T.$(
-    "There's a <myButton /> in my {text}!",
-    {
-        myButton: () => <button>button</button>,
-        text: "sentence",
-    }
-)
+T.$("There's a <myButton /> in my {text}!", {
+	myButton: () => <button>button</button>,
+	text: "sentence",
+});
 ```
 
 If your components have string children, you can translate them inline.
@@ -84,12 +81,12 @@ If your components have string children, you can translate them inline.
 //     " to change your profile picture."
 // ]
 T.$(
-    "<link>Visit your <strong>profile</strong></link> to change your profile picture.",
-    {
-        link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
-        strong: (...children) => <strong>{...children}</strong>,
-    }
-)
+	"<link>Visit your <strong>profile</strong></link> to change your profile picture.",
+	{
+		link: (...children) => <a href={"/user/" + user.uuid}>{...children}</a>,
+		strong: (...children) => <strong>{...children}</strong>,
+	},
+);
 ```
 
 ## Pluralization and advanced ICU syntax
@@ -98,5 +95,5 @@ To get locale-aware pluralization, you should [precompile your translations](htt
 
 ```js
 // Pluralization with ICU syntax
-T("You have { plural, numCats, =0 {0 cats} other {# cats} }", {numCats: 4})
+T("You have { plural, numCats, =0 {0 cats} other {# cats} }", { numCats: 4 });
 ```

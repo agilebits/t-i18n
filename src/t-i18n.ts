@@ -1,5 +1,14 @@
-import { IcuReplacements, Messages, MFunc, Config, AnyReplacements } from "./types";
-import createCachedFormatter, { numberFormats, dateTimeFormats} from "./format";
+import {
+	IcuReplacements,
+	Messages,
+	MFunc,
+	Config,
+	AnyReplacements,
+} from "./types";
+import createCachedFormatter, {
+	numberFormats,
+	dateTimeFormats,
+} from "./format";
 import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
@@ -17,22 +26,42 @@ import parseXml from "./xml";
  */
 export interface BasicTFunc {
 	(message: string, replacements?: IcuReplacements, id?: string): string;
-	$: <X>(message: string, replacements?: AnyReplacements<X>, id?: string) => (X | string)[];
+	$: <X>(
+		message: string,
+		replacements?: AnyReplacements<X>,
+		id?: string,
+	) => (X | string)[];
 	generateId: (message: string) => string;
 	locale: () => string;
-	lookup: (id: string, replacements?: IcuReplacements, defaultMessage?:string) => string
+	lookup: (
+		id: string,
+		replacements?: IcuReplacements,
+		defaultMessage?: string,
+	) => string;
 	set: (options?: Partial<Config>) => Config;
 }
 
 export interface IntlFormatters {
-	date: (value: Date | number, formatName?: keyof typeof dateTimeFormats, locale?: string) => string;
-	number: (value: number, formatName?: keyof typeof numberFormats, locale?: string) => string;
+	date: (
+		value: Date | number,
+		formatName?: keyof typeof dateTimeFormats,
+		locale?: string,
+	) => string;
+	number: (
+		value: number,
+		formatName?: keyof typeof numberFormats,
+		locale?: string,
+	) => string;
 }
 export type TFunc = BasicTFunc & IntlFormatters;
 
 const defaultLanguage = "en";
 
-const getKey = (allMessages: Messages, locale: string, key: string): MFunc | string => {
+const getKey = (
+	allMessages: Messages,
+	locale: string,
+	key: string,
+): MFunc | string => {
 	const messages = allMessages[locale];
 	const defaultMessages = allMessages[defaultLanguage];
 
@@ -44,7 +73,7 @@ const getKey = (allMessages: Messages, locale: string, key: string): MFunc | str
 	}
 
 	return "";
-}
+};
 
 const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 	if (typeof Intl === "undefined") {
@@ -58,20 +87,23 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 	const getDateTimeFormat = () => {
 		const delegate = Intl.DateTimeFormat;
 		function DateTimeFormat(this: any) {
-			const args= Array.prototype.slice.apply(arguments);
+			const args = Array.prototype.slice.apply(arguments);
 			const lang = typeof args?.[0] === "string" ? args[0] : "en-US";
-			const timeZone = typeof args?.[1]?.timeZone === "string" ? args[1].timeZone : "America/Toronto";
+			const timeZone =
+				typeof args?.[1]?.timeZone === "string"
+					? args[1].timeZone
+					: "America/Toronto";
 			return delegate.apply(this, [lang, timeZone]);
 		}
 		DateTimeFormat.prototype = delegate.prototype;
 		return DateTimeFormat;
-	}
+	};
 
 	try {
 		Intl.DateTimeFormat();
-		(new Date()).toLocaleString();
-		(new Date()).toLocaleDateString();
-		(new Date()).toLocaleTimeString();
+		new Date().toLocaleString();
+		new Date().toLocaleDateString();
+		new Date().toLocaleTimeString();
 	} catch (err) {
 		Date.prototype.toLocaleString = Date.prototype.toString;
 		Date.prototype.toLocaleDateString = Date.prototype.toDateString;
@@ -80,21 +112,33 @@ const makeIntlFormatters = (locale: () => string): IntlFormatters => {
 	}
 	// HACK: end
 
-	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(Intl.DateTimeFormat);
-	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(Intl.NumberFormat);
+	const dateFormatter = createCachedFormatter<Intl.DateTimeFormat>(
+		Intl.DateTimeFormat,
+	);
+	const numberFormatter = createCachedFormatter<Intl.NumberFormat>(
+		Intl.NumberFormat,
+	);
 
-	const date = (value: Date | number, style: keyof typeof dateTimeFormats = "long", dateLocale = locale()) => {
+	const date = (
+		value: Date | number,
+		style: keyof typeof dateTimeFormats = "long",
+		dateLocale = locale(),
+	) => {
 		const format = dateTimeFormats[style] || dateTimeFormats.long;
 		return dateFormatter(dateLocale, format).format(value);
-	}
+	};
 
-	const number = (value: number, style: keyof typeof numberFormats = "decimal", numberLocale = locale()) => {
+	const number = (
+		value: number,
+		style: keyof typeof numberFormats = "decimal",
+		numberLocale = locale(),
+	) => {
 		const format = numberFormats[style] || numberFormats.decimal;
 		return numberFormatter(numberLocale, format).format(value);
-	}
+	};
 
 	return { date, number };
-}
+};
 
 export const makeBasicT = (): BasicTFunc => {
 	let messages: Messages = {};
@@ -107,28 +151,40 @@ export const makeBasicT = (): BasicTFunc => {
 		idGenerator = options.idGenerator || idGenerator;
 
 		return { messages, locale, idGenerator };
-	}
+	};
 
 	const generateId = (message: string) => idGenerator(message);
 
-	const lookup = (id: string, replacements: IcuReplacements = {}, defaultMessage = ""): string => {
+	const lookup = (
+		id: string,
+		replacements: IcuReplacements = {},
+		defaultMessage = "",
+	): string => {
 		const translation = getKey(messages, locale, id) || defaultMessage || id;
 		if (typeof translation === "string") {
 			return parseIcu(translation, replacements);
 		}
 
 		return translation(replacements);
-	}
+	};
 
-	const T = (message: string, replacements: IcuReplacements = {}, id = ""): string => {
+	const T = (
+		message: string,
+		replacements: IcuReplacements = {},
+		id = "",
+	): string => {
 		return lookup(id || generateId(message), replacements, message);
-	}
+	};
 
-	const $ = <X>(message: string, replacements: AnyReplacements<X> = {}, id = ""): (X | string)[] => {
+	const $ = <X>(
+		message: string,
+		replacements: AnyReplacements<X> = {},
+		id = "",
+	): (X | string)[] => {
 		const [icu, xml] = splitAndEscapeReplacements(replacements);
 		const translatedMessage = T(message, icu, id);
 		return parseXml(translatedMessage, xml);
-	}
+	};
 
 	const properties = {
 		$,
@@ -139,13 +195,13 @@ export const makeBasicT = (): BasicTFunc => {
 	};
 
 	return assign(T, properties);
-}
+};
 
 export const makeT = (): TFunc => {
 	const T = makeBasicT();
 	const formatters = makeIntlFormatters(T.locale);
 	return assign(T, formatters);
-}
+};
 
 // singleton (T)
 export default makeT();

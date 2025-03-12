@@ -1,14 +1,13 @@
 {
-
-    "compilerOptions": {
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "target": "es5",
-        "removeComments": true,
-        "declaration": true,
-        "strict": true,
-        "outDir": "../dist/"
-    }
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"target": "es5",
+		"removeComments": true,
+		"declaration": true,
+		"strict": true,
+		"outDir": "../dist/"
+	}
 }

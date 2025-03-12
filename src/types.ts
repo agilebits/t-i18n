@@ -4,11 +4,9 @@
 // const mFunc = (name) => "Hello, " + name
 // mFunc("Mitch") // "Hello, Mitch"
 //
-export type MFunc =  (replacements?: IcuReplacements) => string;
+export type MFunc = (replacements?: IcuReplacements) => string;
 // Function to compile strings into message functions during runtime
 export type Compiler = (message: string) => MFunc;
-
-
 
 // Message functions are grouped by locale and keyed to IDs
 //
@@ -19,7 +17,7 @@ export type Compiler = (message: string) => MFunc;
 // }
 //
 export interface Messages {
-	[s: string]: {[s: string]: string|MFunc}
+	[s: string]: { [s: string]: string | MFunc };
 }
 
 export interface Config {
@@ -29,8 +27,8 @@ export interface Config {
 }
 
 export type Mutable<X> = {
-	[P in keyof X]: X[P];
-}
+	-readonly [P in keyof X]: X[P];
+};
 
 // { name: "Mitch", age: 10 }
 export interface IcuReplacements {
