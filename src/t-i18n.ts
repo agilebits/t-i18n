@@ -203,5 +203,47 @@ export const makeT = (): TFunc => {
 	return assign(T, formatters);
 };
 
+/**
+ * Create a version of `T` that only errors.
+ *
+ * This is useful if you need to enforce a certain way of loading strings,
+ * such as with React's Context Providers.
+ */
+export const makeErrorBasicT = (message: string): BasicTFunc => {
+	const errorFn = () => {
+		throw new Error(message);
+	};
+
+	return assign(errorFn, {
+		$: errorFn,
+		generateId: errorFn,
+		locale: errorFn,
+		lookup: errorFn,
+		set: errorFn,
+	});
+};
+
+/**
+ * Create a version of `T` that only errors.
+ *
+ * This is useful if you need to enforce a certain way of loading strings,
+ * such as with React's Context Providers.
+ */
+export const makeErrorT = (message: string): TFunc => {
+	const errorFn = () => {
+		throw new Error(message);
+	};
+
+	return assign(errorFn, {
+		$: errorFn,
+		generateId: errorFn,
+		locale: errorFn,
+		lookup: errorFn,
+		set: errorFn,
+		date: errorFn,
+		number: errorFn,
+	});
+};
+
 // singleton (T)
 export default makeT();
