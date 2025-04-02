@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeT = exports.makeBasicT = void 0;
+exports.makeErrorT = exports.makeErrorBasicT = exports.makeT = exports.makeBasicT = void 0;
 var format_1 = require("./format");
 var helpers_1 = require("./helpers");
 var icu_1 = require("./icu");
@@ -30,7 +30,9 @@ var makeIntlFormatters = function (locale) {
             var _a;
             var args = Array.prototype.slice.apply(arguments);
             var lang = typeof (args === null || args === void 0 ? void 0 : args[0]) === "string" ? args[0] : "en-US";
-            var timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
+            var timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string"
+                ? args[1].timeZone
+                : "America/Toronto";
             return delegate.apply(this, [lang, timeZone]);
         }
         DateTimeFormat.prototype = delegate.prototype;
@@ -38,9 +40,9 @@ var makeIntlFormatters = function (locale) {
     };
     try {
         Intl.DateTimeFormat();
-        (new Date()).toLocaleString();
-        (new Date()).toLocaleDateString();
-        (new Date()).toLocaleTimeString();
+        new Date().toLocaleString();
+        new Date().toLocaleDateString();
+        new Date().toLocaleTimeString();
     }
     catch (err) {
         Date.prototype.toLocaleString = Date.prototype.toString;
@@ -113,4 +115,32 @@ var makeT = function () {
     return (0, helpers_1.assign)(T, formatters);
 };
 exports.makeT = makeT;
+var makeErrorBasicT = function (message) {
+    var errorFn = function () {
+        throw new Error(message);
+    };
+    return (0, helpers_1.assign)(errorFn, {
+        $: errorFn,
+        generateId: errorFn,
+        locale: errorFn,
+        lookup: errorFn,
+        set: errorFn,
+    });
+};
+exports.makeErrorBasicT = makeErrorBasicT;
+var makeErrorT = function (message) {
+    var errorFn = function () {
+        throw new Error(message);
+    };
+    return (0, helpers_1.assign)(errorFn, {
+        $: errorFn,
+        generateId: errorFn,
+        locale: errorFn,
+        lookup: errorFn,
+        set: errorFn,
+        date: errorFn,
+        number: errorFn,
+    });
+};
+exports.makeErrorT = makeErrorT;
 exports.default = (0, exports.makeT)();

@@ -15,5 +15,7 @@ export interface IntlFormatters {
 export type TFunc = BasicTFunc & IntlFormatters;
 export declare const makeBasicT: () => BasicTFunc;
 export declare const makeT: () => TFunc;
+export declare const makeErrorBasicT: (message: string) => BasicTFunc;
+export declare const makeErrorT: (message: string) => TFunc;
 declare const _default: TFunc;
 export default _default;

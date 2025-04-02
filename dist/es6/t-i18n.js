@@ -1,4 +1,4 @@
-import createCachedFormatter, { numberFormats, dateTimeFormats } from "./format";
+import createCachedFormatter, { numberFormats, dateTimeFormats, } from "./format";
 import { generator, assign, splitAndEscapeReplacements } from "./helpers";
 import parseIcu from "./icu";
 import parseXml from "./xml";
@@ -27,7 +27,9 @@ const makeIntlFormatters = (locale) => {
             var _a;
             const args = Array.prototype.slice.apply(arguments);
             const lang = typeof (args === null || args === void 0 ? void 0 : args[0]) === "string" ? args[0] : "en-US";
-            const timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string" ? args[1].timeZone : "America/Toronto";
+            const timeZone = typeof ((_a = args === null || args === void 0 ? void 0 : args[1]) === null || _a === void 0 ? void 0 : _a.timeZone) === "string"
+                ? args[1].timeZone
+                : "America/Toronto";
             return delegate.apply(this, [lang, timeZone]);
         }
         DateTimeFormat.prototype = delegate.prototype;
@@ -35,9 +37,9 @@ const makeIntlFormatters = (locale) => {
     };
     try {
         Intl.DateTimeFormat();
-        (new Date()).toLocaleString();
-        (new Date()).toLocaleDateString();
-        (new Date()).toLocaleTimeString();
+        new Date().toLocaleString();
+        new Date().toLocaleDateString();
+        new Date().toLocaleTimeString();
     }
     catch (err) {
         Date.prototype.toLocaleString = Date.prototype.toString;
@@ -96,5 +98,31 @@ export const makeT = () => {
     const T = makeBasicT();
     const formatters = makeIntlFormatters(T.locale);
     return assign(T, formatters);
+};
+export const makeErrorBasicT = (message) => {
+    const errorFn = () => {
+        throw new Error(message);
+    };
+    return assign(errorFn, {
+        $: errorFn,
+        generateId: errorFn,
+        locale: errorFn,
+        lookup: errorFn,
+        set: errorFn,
+    });
+};
+export const makeErrorT = (message) => {
+    const errorFn = () => {
+        throw new Error(message);
+    };
+    return assign(errorFn, {
+        $: errorFn,
+        generateId: errorFn,
+        locale: errorFn,
+        lookup: errorFn,
+        set: errorFn,
+        date: errorFn,
+        number: errorFn,
+    });
 };
 export default makeT();

@@ -1,7 +1,7 @@
 const XML_WRAPPER = "wrap";
 let parser;
 export default function parseXml(xmlString, replacements) {
-    if (typeof parser === 'undefined') {
+    if (typeof parser === "undefined") {
         parser = new DOMParser();
     }
     const xmlDoc = parser.parseFromString(`<${XML_WRAPPER}>${xmlString}</${XML_WRAPPER}>`, "text/xml");
@@ -19,9 +19,9 @@ function walk(node, replacements, isRoot = false) {
     else if (node.nodeType === NODE_TYPE_ELEMENT) {
         const children = Array.prototype.slice.call(node.childNodes);
         const replacedChildren = children.reduce((acc, child) => [...acc, ...walk(child, replacements)], []);
-        return (isRoot || !replacements[node.nodeName]
+        return isRoot || !replacements[node.nodeName]
             ? replacedChildren
-            : [replacements[node.nodeName](...replacedChildren)]);
+            : [replacements[node.nodeName](...replacedChildren)];
     }
     else {
         return [];

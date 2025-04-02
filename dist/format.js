@@ -15,32 +15,32 @@ exports.dateTimeFormats = {
     short: {
         month: "short",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
     },
     long: {
         month: "long",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
     },
     dateTime: {
         month: "short",
         day: "numeric",
         year: "numeric",
         hour: "numeric",
-        minute: "numeric"
-    }
+        minute: "numeric",
+    },
 };
 exports.numberFormats = {
     currency: {
         style: "currency",
-        currency: "USD"
+        currency: "USD",
     },
     decimal: {
-        style: "decimal"
+        style: "decimal",
     },
     percent: {
-        style: "percent"
-    }
+        style: "percent",
+    },
 };
 function createCachedFormatter(intlFormat) {
     var cache = {};
@@ -50,7 +50,8 @@ function createCachedFormatter(intlFormat) {
         var id = locale + "-" + JSON.stringify(formatOptions);
         if (id in cache)
             return cache[id];
-        var formatter = new ((_a = Function.prototype.bind).call.apply(_a, __spreadArray([intlFormat, null], args, false)));
+        var formatter = new ((_a = Function.prototype.bind).call.apply(_a, __spreadArray([intlFormat,
+            null], args, false)))();
         cache[id] = formatter;
         return formatter;
     };

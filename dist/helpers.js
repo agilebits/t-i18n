@@ -9,25 +9,32 @@ exports.generator = {
         return message;
     },
     hyphens: function (message) {
-        var hyphenated = message.trim().replace(spaceRegex, "-").replace(nonWordRegex, '-');
+        var hyphenated = message
+            .trim()
+            .replace(spaceRegex, "-")
+            .replace(nonWordRegex, "-");
         return hyphenated;
-    }
+    },
 };
 function Plural(pluralizeFor, options) {
     var zero = options.zero, one = options.one, other = options.other;
-    return "{" + pluralizeFor + ", plural,\n" +
+    return ("{" +
+        pluralizeFor +
+        ", plural,\n" +
         (zero ? "\t=0{" + zero + "}\n" : "") +
         (one ? "\tone{" + one + "}\n" : "") +
-        ("\tother{" + other + "}}");
+        ("\tother{" + other + "}}"));
 }
 var xmlEscapes = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    "\"": "&quot;",
-    "'": '&#39;'
+    '"': "&quot;",
+    "'": "&#39;",
 };
-var escapeXml = function (str) { return (str.replace(/[&<>"']/g, function (match) { return xmlEscapes[match]; })); };
+var escapeXml = function (str) {
+    return str.replace(/[&<>"']/g, function (match) { return xmlEscapes[match]; });
+};
 var splitAndEscapeReplacements = function (replacements) {
     var icu = {};
     var xml = {};

@@ -7,8 +7,8 @@ const glob_1 = require("glob");
 const minimist = require("minimist");
 const index_1 = require("../dist/index");
 const helpers = {
-    "Plural": index_1.Plural,
-    "generator": index_1.generator
+    Plural: index_1.Plural,
+    generator: index_1.generator,
 };
 function evaluate(node, src) {
     if (!node)
@@ -30,7 +30,8 @@ function findMethodCall(objectName, methodName, src) {
             return;
         if (node.kind === ts.SyntaxKind.CallExpression) {
             const call = node;
-            if (call.expression.kind && call.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
+            if (call.expression.kind &&
+                call.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
                 const methodCall = call.expression, obj = methodCall.expression, method = methodCall.name;
                 if (obj.text === objectName && method.text === methodName) {
                     res.push(node);
@@ -59,9 +60,12 @@ function findFunctionCall(tagName, src) {
 }
 function extractMessages(contents) {
     const srcFile = ts.createSourceFile("file.ts", contents, ts.ScriptTarget.ES2017, false, ts.ScriptKind.TSX);
-    const tCalls = [...findFunctionCall("T", srcFile), ...findMethodCall("T", "$", srcFile)];
+    const tCalls = [
+        ...findFunctionCall("T", srcFile),
+        ...findMethodCall("T", "$", srcFile),
+    ];
     let messages = {};
-    tCalls.forEach(c => {
+    tCalls.forEach((c) => {
         const [message, values, id] = c.arguments;
         const evaluatedMessage = evaluate(message, srcFile);
         let idText = id ? id.text : index_1.T.generateId(evaluatedMessage);
@@ -71,8 +75,8 @@ function extractMessages(contents) {
 }
 function runner(files) {
     console.log(`Extracting strings from '${files[0]}' + ${files.length - 1} other files...`);
-    const messages = files.map(file => new Promise(resolve => fs.readFile(file, 'utf8', (err, contents) => resolve(extractMessages(contents)))));
-    Promise.all(messages).then(values => {
+    const messages = files.map((file) => new Promise((resolve) => fs.readFile(file, "utf8", (err, contents) => resolve(extractMessages(contents)))));
+    Promise.all(messages).then((values) => {
         const allMessages = values.reduce((all, current) => {
             return Object.assign(Object.assign({}, all), current);
         }, messages[0]);
@@ -81,14 +85,18 @@ function runner(files) {
 }
 function sort(obj) {
     let sorted = {};
-    Object.keys(obj).sort().forEach(function (key) {
+    Object.keys(obj)
+        .sort()
+        .forEach(function (key) {
         sorted[key] = obj[key];
     });
     return sorted;
 }
 function output(messages, outPath) {
     if (outPath) {
-        fs.writeFileSync(outPath, JSON.stringify(messages, null, "\t"), { encoding: "utf8" });
+        fs.writeFileSync(outPath, JSON.stringify(messages, null, "\t"), {
+            encoding: "utf8",
+        });
         console.log(`Extracted ${Object.keys(messages).length} strings to '${outPath}'.`);
     }
     else {

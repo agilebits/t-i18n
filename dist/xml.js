@@ -13,7 +13,7 @@ exports.default = parseXml;
 var XML_WRAPPER = "wrap";
 var parser;
 function parseXml(xmlString, replacements) {
-    if (typeof parser === 'undefined') {
+    if (typeof parser === "undefined") {
         parser = new DOMParser();
     }
     var xmlDoc = parser.parseFromString("<".concat(XML_WRAPPER, ">").concat(xmlString, "</").concat(XML_WRAPPER, ">"), "text/xml");
@@ -32,9 +32,9 @@ function walk(node, replacements, isRoot) {
     else if (node.nodeType === NODE_TYPE_ELEMENT) {
         var children = Array.prototype.slice.call(node.childNodes);
         var replacedChildren = children.reduce(function (acc, child) { return __spreadArray(__spreadArray([], acc, true), walk(child, replacements), true); }, []);
-        return (isRoot || !replacements[node.nodeName]
+        return isRoot || !replacements[node.nodeName]
             ? replacedChildren
-            : [replacements[node.nodeName].apply(replacements, replacedChildren)]);
+            : [replacements[node.nodeName].apply(replacements, replacedChildren)];
     }
     else {
         return [];

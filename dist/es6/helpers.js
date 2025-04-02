@@ -5,25 +5,30 @@ export const generator = {
         return message;
     },
     hyphens(message) {
-        const hyphenated = message.trim().replace(spaceRegex, "-").replace(nonWordRegex, '-');
+        const hyphenated = message
+            .trim()
+            .replace(spaceRegex, "-")
+            .replace(nonWordRegex, "-");
         return hyphenated;
-    }
+    },
 };
 export function Plural(pluralizeFor, options) {
     const { zero, one, other } = options;
-    return "{" + pluralizeFor + ", plural,\n" +
+    return ("{" +
+        pluralizeFor +
+        ", plural,\n" +
         (zero ? "\t=0{" + zero + "}\n" : "") +
         (one ? "\tone{" + one + "}\n" : "") +
-        ("\tother{" + other + "}}");
+        ("\tother{" + other + "}}"));
 }
 const xmlEscapes = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    "\"": "&quot;",
-    "'": '&#39;'
+    '"': "&quot;",
+    "'": "&#39;",
 };
-const escapeXml = (str) => (str.replace(/[&<>"']/g, (match) => xmlEscapes[match]));
+const escapeXml = (str) => str.replace(/[&<>"']/g, (match) => xmlEscapes[match]);
 export const splitAndEscapeReplacements = (replacements) => {
     const icu = {};
     const xml = {};
