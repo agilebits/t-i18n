@@ -1,12 +1,12 @@
 {
 	"name": "t-i18n",
-	"version": "0.6.6",
+	"version": "0.6.7",
 	"description": "Simple, standards-based localization",
 	"author": "Mitch Cohen <mitch.cohen@me.com>",
 	"homepage": "https://github.com/agilebits/t-i18n#readme",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:agilebits/t-i18n.git"
+		"url": "git+ssh://git@github.com/agilebits/t-i18n.git"
 	},
 	"license": "MIT",
 	"main": "dist/index.js",
@@ -15,7 +15,7 @@
 	"scripts": {
 		"clean": "cd dist/; rm -rf *",
 		"build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
-		"prepublishOnly": "npm run build",
+		"prepublishOnly": "npm install && npm run build",
 		"prettier": "prettier . --write",
 		"prettier-check": "prettier . --check",
 		"test": "mocha -r ts-node/register ./test/*.test.ts"
@@ -24,7 +24,7 @@
 		"useTabs": true
 	},
 	"bin": {
-		"extract-strings": "./scripts/extract-strings.js"
+		"extract-strings": "scripts/extract-strings.js"
 	},
 	"keywords": [
 		"i18n",
@@ -39,13 +39,13 @@
 		"@types/node": "^22.13.10",
 		"@xmldom/xmldom": "^0.8.10",
 		"chai": "^4.2.0",
-		"glob": "^11.0.1",
 		"mocha": "^11.1.0",
 		"prettier": "^3.5.3",
 		"ts-node": "^10.9.2",
 		"typescript": "5.5"
 	},
 	"dependencies": {
+		"glob": "^11.0.1",
 		"minimist": "^1.2.8"
 	}
 }
