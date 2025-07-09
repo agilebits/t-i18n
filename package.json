@@ -1,6 +1,6 @@
 {
 	"name": "t-i18n",
-	"version": "0.6.7",
+	"version": "0.7.0",
 	"description": "Simple, standards-based localization",
 	"author": "Mitch Cohen <mitch.cohen@me.com>",
 	"homepage": "https://github.com/agilebits/t-i18n#readme",
@@ -13,12 +13,12 @@
 	"module": "dist/es6/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"clean": "cd dist/; rm -rf *",
+		"clean": "rm -rf dist",
 		"build": "npm run clean; cd src/; tsc -d; tsc -d -p tsconfig.es6.json; cd ../scripts; tsc",
 		"prepublishOnly": "npm install && npm run build",
 		"prettier": "prettier . --write",
 		"prettier-check": "prettier . --check",
-		"test": "mocha -r ts-node/register ./test/*.test.ts"
+		"test": "NODE_OPTIONS=\"--import=tsx\" mocha ./test/*.test.ts"
 	},
 	"prettier": {
 		"useTabs": true
@@ -34,18 +34,26 @@
 		"icu"
 	],
 	"devDependencies": {
-		"@types/chai": "^4.2.7",
+		"@types/chai": "^5.2.2",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.13.10",
-		"@xmldom/xmldom": "^0.8.10",
-		"chai": "^4.2.0",
-		"mocha": "^11.1.0",
-		"prettier": "^3.5.3",
-		"ts-node": "^10.9.2",
-		"typescript": "5.5"
+		"@xmldom/xmldom": "^0.9.8",
+		"chai": "^5.2.1",
+		"mocha": "^11.7.1",
+		"prettier": "^3.6.2",
+		"tsx": "^4.20.3",
+		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"glob": "^11.0.1",
+		"glob": "^11.0.3",
 		"minimist": "^1.2.8"
+	},
+	"peerDependencies": {
+		"typescript": "^5.8.3"
+	},
+	"peerDependenciesMeta": {
+		"typescript": {
+			"optional": true
+		}
 	}
 }
